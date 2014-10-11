@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 //import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 //import android.view.Menu;
 //import android.view.MenuInflater;
 //import android.view.MenuItem;
@@ -27,9 +28,12 @@ public class MainActivity extends FragmentActivity
 implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	
 	 private GoogleMap mMap;
+	 private Handler mHandler;
 
 	    private LocationClient mLocationClient;
 	    private LoggingClient mLoggingClient;
+	    
+	    private int mLoggingInterval = 20000; // Time span between position updates -- currently 20 seconds
 
 	    // These settings are the same as the settings for the map. They will in fact give you updates
 	    // at the maximal rates currently possible.
@@ -43,6 +47,7 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	        super.onCreate(savedInstanceState);
 	        mLoggingClient = new LoggingClient();
 	        setContentView(R.layout.activity_main);
+	        mHandler = new Handler();
 	    }
 
 	    @Override
@@ -121,6 +126,10 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	     * without needing to register a LocationListener.
 	     */
 	    public void logPositionButton(View view) {
+	    	logPosition();
+	    }
+	    
+	    public void logPosition() {
 	    	int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 			if (result == ConnectionResult.SUCCESS) {
 				Location mLocation = mLocationClient.getLastLocation();
@@ -140,6 +149,7 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	    		b.setVisibility(View.VISIBLE);
 	    		b = findViewById(R.id.log_position_button);
 	    		b.setVisibility(View.VISIBLE);
+	    		startLoggingPos();
 	    	}
 	    	else
 				Toast.makeText(this, "login failed!", Toast.LENGTH_SHORT).show();
@@ -154,6 +164,7 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	    		b.setVisibility(View.VISIBLE);
 	    		b = findViewById(R.id.log_position_button);
 	    		b.setVisibility(View.INVISIBLE);
+	    		stopLoggingPos();
 	    	} else 
 				Toast.makeText(this, "logout failed!", Toast.LENGTH_SHORT).show();
 	    }
@@ -196,4 +207,19 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	    public void onConnectionFailed(ConnectionResult result) {
 	        // Do nothing
 	    }
+	    
+	    Runnable mPositionLogger = new Runnable() {
+	        @Override 
+	        public void run() {
+	          logPosition(); //this function can change value of mInterval.
+	          mHandler.postDelayed(mPositionLogger, mLoggingInterval);
+	        }
+	      };
+	      void startLoggingPos() {
+	    	  mPositionLogger.run(); 
+	      }
+
+	      void stopLoggingPos() {
+	    	   mHandler.removeCallbacks(mPositionLogger);
+	      }
 }
