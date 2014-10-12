@@ -7,5 +7,7 @@
     <string name="login_text">Login</string>
     <string name="logout_text">Logout</string>
     <string name="logpos_text">Send Data</string>
+    <string name="username_hint">username</string>
+    <string name="password_hint">password</string>
 
 </resources>

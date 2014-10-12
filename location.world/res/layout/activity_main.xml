@@ -20,84 +20,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:id = "@+id/menu_layout" 
-        style= "@style/MenuStyle">
 
-                <Button
-                    android:id="@+id/log_position_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:onClick="logPositionButton"
-                    android:padding="8dp"
-                    android:text="@string/logpos_text"
-                    android:visibility="invisible" />
 
-                <Button
-                    android:id="@+id/hide_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/password_text"
-                    android:onClick="hideMenu"
-                    android:text="Hide" />
-
-                <EditText
-                    android:id="@+id/userid_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:visibility="visible" />
-
-                <EditText
-                    android:id="@+id/password_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignLeft="@+id/userid_text"
-                    android:layout_alignRight="@+id/userid_text"
-                    android:layout_below="@+id/userid_text"
-                    android:ems="10"
-                    android:inputType="textPassword"
-                    android:visibility="visible" >
-
-                    <requestFocus />
-                </EditText>
-
-                <Button
-                    android:id="@+id/log_out_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/log_in_button"
-                    android:layout_alignBottom="@+id/log_in_button"
-                    android:layout_centerHorizontal="true"
-                    android:onClick="logOutButton"
-                    android:padding="8dp"
-                    android:text="@string/logout_text"
-                    android:visibility="invisible" />
-
-                <Button
-                    android:id="@+id/log_in_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@+id/hide_button"
-                    android:layout_alignBottom="@+id/hide_button"
-                    android:layout_centerHorizontal="true"
-                    android:onClick="logInButton"
-                    android:padding="8dp"
-                    android:text="@string/login_text" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
+   <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -109,14 +34,39 @@
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.SupportMapFragment" />
 
+
         <Button
-            android:id="@+id/menu_button"
+            android:id="@+id/log_out_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="Menu"
-            android:onClick = "openMenu" />
+            android:layout_alignRight="@+id/log_position_button"
+            android:onClick="logOutButton"
+            android:padding="8dp"
+            android:text="@string/logout_text"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/log_position_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/log_out_button"
+            android:onClick="logPositionButton"
+            android:padding="8dp"
+            android:text="@string/logpos_text"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/login_dialog_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/log_position_button"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/log_out_button"
+            android:onClick="openLoginDialog"
+            android:text="Login" />
 
     </RelativeLayout>
 

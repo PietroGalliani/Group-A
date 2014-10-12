@@ -13,50 +13,43 @@ import com.google.android.gms.maps.GoogleMap;
 
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.groupA.location.world.LoginDialogFragment.LoginDialogListener;
 
-import android.support.v4.app.FragmentActivity;
-import android.content.Context;
-//import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+//import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 //import android.view.Menu;
 //import android.view.MenuInflater;
 //import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+//import android.widget.Toast;
 
-import android.view.KeyEvent;
-import android.view.inputmethod.InputMethodManager;
 
 public class MainActivity extends FragmentActivity
-implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener, LoginDialogListener {
 	
 	
 	
 	 private GoogleMap mMap;
 	 private Handler mHandler;
 	 
-	 private TextView userIDText, userPasswdText;
 
 	    private LocationClient mLocationClient;
 	    private LoggingClient mLoggingClient;
 	    
-	    private Button logInButton, logOutButton, logPosButton;
-	    
-	    private Button menuButton;
-	    private View menuLayout;
+	    private Button logOutButton, logPosButton, logInDialogButton;
+
 	    	    
 	    private int mLoggingInterval = 20000; // Time span between position updates -- currently 20 seconds
 
 	    private int mZoomLevel = 15;
 	    
 	    private Boolean isLoggingActive = false;
-	    
-	    private Boolean isMenuVisible = false;
-	    	    
+	    	    	    
 	    
 	    // These settings are the same as the settings for the map. They will in fact give you updates
 	    // at the maximal rates currently possible.
@@ -72,30 +65,12 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	        mLoggingClient = new LoggingClient();
 	        setContentView(R.layout.activity_main);
 	        mHandler = new Handler();
-	        userIDText = (TextView) findViewById(R.id.userid_text);
-	        userPasswdText = (TextView) findViewById(R.id.password_text);
-	        logInButton = (Button)findViewById(R.id.log_in_button);
 	        logOutButton = (Button) findViewById(R.id.log_out_button); 
 	        logPosButton = (Button) findViewById(R.id.log_position_button);
-	        menuLayout = findViewById(R.id.menu_layout);
-	        menuButton = (Button) findViewById(R.id.menu_button);
+	        logInDialogButton = (Button) findViewById(R.id.login_dialog_button);
+
 	        
-	       //Enter on password field tries to log in
-	        userPasswdText.setOnKeyListener(new View.OnKeyListener() {
-	            public boolean onKey(View v, int keyCode, KeyEvent event) {
-	                // If the event is a key-down event on the "enter" button
-	                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-	                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
-	                  // Perform action on key press
-	                	logInButton(v);
-	                  return true;
-	                }
-	                return false;
-	            }
-	        });
-	        
-	        //focus should be on user id field, not on password one
-	        userIDText.requestFocus();
+
 	        
 	        //Restore the map without reloading it in case of rotations
 	        SupportMapFragment mapFragment =
@@ -120,7 +95,6 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	        outState.putBoolean("loggingActive", isLoggingActive);
 	        outState.putInt("loggingInterval", mLoggingInterval);
 	        outState.putInt("zoomLevel", mZoomLevel);*/
-	        outState.putBoolean("menuVisible", isMenuVisible);
 	        outState.putParcelable("loggingClient", mLoggingClient);
 	        outState.putBoolean("loggingActive", isLoggingActive);
 	        outState.putString("logOutButtonText", logOutButton.getText().toString());
@@ -139,20 +113,13 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 	      mLoggingInterval = savedInstanceState.getInt("loggingInterval");
 	      mZoomLevel = savedInstanceState.getInt("zoomLevel");*/
 	      
-	      isMenuVisible = savedInstanceState.getBoolean("menuVisible");
-	      
-	      if (isMenuVisible) {
-	    	  menuLayout.setVisibility(View.VISIBLE);
-		      menuButton.setVisibility(View.INVISIBLE);
-	      }
+
 	      mLoggingClient = savedInstanceState.getParcelable("loggingClient");
 	      
 	      if (mLoggingClient.is_logged()) {
-	    	  logInButton.setVisibility(View.INVISIBLE);
 	    		logOutButton.setVisibility(View.VISIBLE);
 	    		logPosButton.setVisibility(View.VISIBLE);
-	    		userIDText.setVisibility(View.GONE);
-	    		userPasswdText.setVisibility(View.GONE);
+	    		logInDialogButton.setVisibility(View.INVISIBLE);
 	      }
 	      
 	      isLoggingActive = savedInstanceState.getBoolean("loggingActive");
@@ -247,62 +214,72 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 				mLoggingClient.logCoords(this, mLocation);
 				//goToCurrentPosition();
 			}
-			else
-				Toast.makeText(this, "Google Play Unavailable: output = " + result, Toast.LENGTH_SHORT).show();
+			else {
+				ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+	    		errorDialog.mMessage="Could not connect to Google Play Services. Output: " + result; 
+	    		errorDialog.mTitle="Google Play Services Unavailable";
+	    		errorDialog.show(getSupportFragmentManager(), "GooglePlayErrorDialogFragment");
+			}
 	    }
 	    
-	    public void logInButton(View view) {
-	    	String userID = userIDText.getText().toString();
-	    	String password = userPasswdText.getText().toString();
-	    	userPasswdText.setText("");
+	    
+	    public void openLoginDialog(View view){
+	    	LoginDialogFragment loginDialog = new LoginDialogFragment();
+    		loginDialog.show(getSupportFragmentManager(), "OpenLoginDialogFragment");
+	    }
+	    
+	    // The dialog fragment receives a reference to this Activity through the
+	    // Fragment.onAttach() callback, which it uses to call the following methods
+	    // defined by the NoticeDialogFragment.NoticeDialogListener interface
+	    @Override
+	    public void onLoginDialogLogin(String userID, String password) {
 	    	int result = mLoggingClient.logIn(userID, password);
-	    	if (result == LoggingClient.LOGIN_OK) {
-	    		logInButton.setVisibility(View.INVISIBLE);
+	    	if (result == LoggingClient.LOGIN_OK) {	    		
+	    		
+	    		logInDialogButton.setVisibility(View.INVISIBLE);
 	    		logOutButton.setVisibility(View.VISIBLE);
 	    		logPosButton.setVisibility(View.VISIBLE);
-	    		logOutButton.setText("Log Out (" + mLoggingClient.getUserID()+")");
-	    		userIDText.setVisibility(View.GONE);
-	    		userPasswdText.setVisibility(View.GONE);
+	    		logOutButton.setText("Log Out (" + mLoggingClient.getUserID()+")");		
 	    		startLoggingPos();
 	    		isLoggingActive = true;
-	    		hideMenu(view);
 	    	}
-	    	else
-				Toast.makeText(this, "login failed!", Toast.LENGTH_SHORT).show();
+	    	else {
+				//Toast.makeText(this, "login failed!", Toast.LENGTH_SHORT).show();
+	    		LoginDialogFragment loginDialog = new LoginDialogFragment();
+	    		loginDialog.mID = userID; 
+	    		loginDialog.show(getSupportFragmentManager(), "OpenLoginDialogFragment");
+	    		
+	    		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+	    		errorDialog.mMessage="The User ID/Password combination has not been found. Please correct and retry."; 
+	    		errorDialog.mTitle="Login Failed";
+	    		errorDialog.show(getSupportFragmentManager(), "LoginErrorDialogFragment");
+
+	    	}
 	    }
+
+
 	    
 	    public void logOutButton(View view) {
 	    	int result = mLoggingClient.logOut();
 	    	if (result == LoggingClient.LOGOUT_OK) {
-	    		logInButton.setVisibility(View.VISIBLE);
+	    		logInDialogButton.setVisibility(View.VISIBLE);
 	    		logOutButton.setVisibility(View.INVISIBLE);
 	    		logPosButton.setVisibility(View.INVISIBLE);
-	    		userIDText.setVisibility(View.VISIBLE);
-	    		userPasswdText.setVisibility(View.VISIBLE);
 	    		isLoggingActive = false;
 	    		stopLoggingPos();
-	    	} else 
-				Toast.makeText(this, "logout failed!", Toast.LENGTH_SHORT).show();
+	    	} else {
+		    	LoginDialogFragment loginDialog = new LoginDialogFragment();
+	    		loginDialog.show(getSupportFragmentManager(), "OpenLoginDialogFragment");
+	    		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+	    		errorDialog.mMessage="Could not log out. Are you sure you are logged in?"; 
+	    		errorDialog.mTitle="Logout Failed";
+	    		errorDialog.show(getSupportFragmentManager(), "LogoutFailDialogFragment");	  
+	    	}
 	    }
 	    
+		
 	    
-	    public void openMenu(View view) {
-	    	menuLayout.setVisibility(View.VISIBLE);
-	    	menuButton.setVisibility(View.INVISIBLE);
-	    	isMenuVisible = true;
-	    }
-	    
-	    public void hideMenu(View view) {
-	    	
-	    	//If we were writing in some text field, forget about it
-    		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-    	    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-	    	
-	    	menuLayout.setVisibility(View.GONE);
-	    	menuButton.setVisibility(View.VISIBLE); 
-	    	
-	    	isMenuVisible = false;
-	    }
+
 
 	    /**
 	     * Update automatically the map whenever the location changes (so it tracks you)
