@@ -1739,6 +1739,7 @@ containing a value of this type.
          */
         public static final int common_signin_button_text_long=0x7f070018;
         public static final int hello_world=0x7f070028;
+        public static final int login_button_text=0x7f07002f;
         public static final int login_text=0x7f07002a;
         public static final int logout_text=0x7f07002b;
         public static final int logpos_text=0x7f07002c;

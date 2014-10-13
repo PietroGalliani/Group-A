@@ -122,10 +122,10 @@ public class LoginDialogFragment extends DialogFragment{
 	}
     
     public void returnIDPasswd(DialogInterface dialog, View view) {
-		LoginDialogListener activity = (LoginDialogListener) getActivity();
+		//LoginDialogListener activity = (LoginDialogListener) getActivity();
         TextView userIDText = (TextView) view.findViewById(R.id.username_field);
         TextView userPasswdText = (TextView) view.findViewById(R.id.password_field); 
-		activity.onLoginDialogLogin(userIDText.getText().toString(), userPasswdText.getText().toString());
+		mListener.onLoginDialogLogin(userIDText.getText().toString(), userPasswdText.getText().toString());
 		hideKeyboard(view);
 		dialog.dismiss();
 	}

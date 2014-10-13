@@ -1,5 +1,5 @@
 package com.groupA.location.world;
-
+//Modular branch -- let's see if this works
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -14,23 +14,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.groupA.location.world.LoginDialogFragment.LoginDialogListener;
+import com.groupA.location.world.LogoutDialogFragment.LogoutDialogListener;
 
-import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-//import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-//import android.view.Menu;
-//import android.view.MenuInflater;
-//import android.view.MenuItem;
+
 import android.view.View;
 import android.widget.Button;
-//import android.widget.Toast;
 
 
 public class MainActivity extends FragmentActivity
-implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener, LoginDialogListener {
+implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener, LoginDialogListener, LogoutDialogListener {
 	
 	
 	
@@ -260,21 +256,9 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener, Lo
 
 	    
 	    public void logOutButton(View view) {
-	    	int result = mLoggingClient.logOut();
-	    	if (result == LoggingClient.LOGOUT_OK) {
-	    		logInDialogButton.setVisibility(View.VISIBLE);
-	    		logOutButton.setVisibility(View.INVISIBLE);
-	    		logPosButton.setVisibility(View.INVISIBLE);
-	    		isLoggingActive = false;
-	    		stopLoggingPos();
-	    	} else {
-		    	LoginDialogFragment loginDialog = new LoginDialogFragment();
-	    		loginDialog.show(getSupportFragmentManager(), "OpenLoginDialogFragment");
-	    		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
-	    		errorDialog.mMessage="Could not log out. Are you sure you are logged in?"; 
-	    		errorDialog.mTitle="Logout Failed";
-	    		errorDialog.show(getSupportFragmentManager(), "LogoutFailDialogFragment");	  
-	    	}
+	    	LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
+	    	logoutDialog.mId = mLoggingClient.getUserID();
+	    	logoutDialog.show(getSupportFragmentManager(), "LogoutDialogFragment");
 	    }
 	    
 		
@@ -339,4 +323,23 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener, Lo
 	      void stopLoggingPos() {
 	    	   mHandler.removeCallbacks(mPositionLogger);
 	      }
+
+		@Override
+		public void onLogoutChosen() {
+			int result = mLoggingClient.logOut();
+	    	if (result == LoggingClient.LOGOUT_OK) {
+	    		logInDialogButton.setVisibility(View.VISIBLE);
+	    		logOutButton.setVisibility(View.INVISIBLE);
+	    		logPosButton.setVisibility(View.INVISIBLE);
+	    		isLoggingActive = false;
+	    		stopLoggingPos();
+	    	} else {
+		    	LoginDialogFragment loginDialog = new LoginDialogFragment();
+	    		loginDialog.show(getSupportFragmentManager(), "OpenLoginDialogFragment");
+	    		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+	    		errorDialog.mMessage="Could not log out. Are you sure you are logged in?"; 
+	    		errorDialog.mTitle="Logout Failed";
+	    		errorDialog.show(getSupportFragmentManager(), "LogoutFailDialogFragment");	  
+	    	}
+		}
 }

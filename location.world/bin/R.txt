@@ -482,6 +482,7 @@ int string common_google_play_services_update_title 0x7f07000c
 int string common_signin_button_text 0x7f070017
 int string common_signin_button_text_long 0x7f070018
 int string hello_world 0x7f070028
+int string login_button_text 0x7f07002f
 int string login_text 0x7f07002a
 int string logout_text 0x7f07002b
 int string logpos_text 0x7f07002c
