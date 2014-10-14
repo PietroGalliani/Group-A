@@ -104,6 +104,4 @@ private LoggingClient(Parcel in) {
 	mUserID = in.readString();
 	logged = (in.readInt() == 1);
 }
-
-	
 }

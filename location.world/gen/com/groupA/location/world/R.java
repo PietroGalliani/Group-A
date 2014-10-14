@@ -1472,7 +1472,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f080028;
         public static final int action_menu_presenter=0x7f080029;
         public static final int action_mode_close_button=0x7f080036;
-        public static final int action_settings=0x7f080055;
+        public static final int action_settings=0x7f080057;
         public static final int activity_chooser_view_content=0x7f080037;
         public static final int always=0x7f08001e;
         public static final int beginning=0x7f080023;
@@ -1502,18 +1502,19 @@ containing a value of this type.
         public static final int image=0x7f080039;
         public static final int listMode=0x7f080014;
         public static final int list_item=0x7f08003b;
-        public static final int log_out_button=0x7f08004f;
-        public static final int log_position_button=0x7f080050;
-        public static final int login_dialog_button=0x7f080051;
-        public static final int logpos_button=0x7f080054;
-        public static final int map=0x7f08004e;
+        public static final int log_out_button=0x7f080053;
+        public static final int log_position_button=0x7f080054;
+        public static final int login_dialog_button=0x7f080055;
+        public static final int logpos_button=0x7f080056;
+        public static final int map=0x7f080052;
+        public static final int mapmanagerfragment=0x7f08004e;
         public static final int match_parent=0x7f08000c;
         public static final int middle=0x7f080024;
         public static final int monochrome=0x7f080013;
         public static final int never=0x7f08001c;
         public static final int none=0x7f080000;
         public static final int normal=0x7f080001;
-        public static final int password_field=0x7f080053;
+        public static final int password_field=0x7f080051;
         public static final int production=0x7f080007;
         public static final int progress_circular=0x7f08002a;
         public static final int progress_horizontal=0x7f08002b;
@@ -1542,9 +1543,10 @@ containing a value of this type.
         public static final int terrain=0x7f080003;
         public static final int title=0x7f08003d;
         public static final int top_action_bar=0x7f080032;
+        public static final int uimanagerfragment=0x7f08004f;
         public static final int up=0x7f080033;
         public static final int useLogo=0x7f080016;
-        public static final int username_field=0x7f080052;
+        public static final int username_field=0x7f080050;
         public static final int withText=0x7f08001f;
         public static final int wrap_content=0x7f08000d;
     }
@@ -1601,7 +1603,9 @@ containing a value of this type.
         public static final int abc_simple_decor=0x7f030017;
         public static final int activity_main=0x7f030018;
         public static final int login_dialog=0x7f030019;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001a;
+        public static final int map_manager=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
+        public static final int ui_layout=0x7f03001c;
     }
     public static final class menu {
         public static final int main_donotuse=0x7f0c0000;

@@ -59,11 +59,10 @@ public class LogoutDialogFragment extends DialogFragment{
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the LogoutDialogListener so we can send events to the host
-            mListener = (LogoutDialogListener) activity;
+            mListener = (LogoutDialogListener) getFragmentManager().findFragmentById(R.id.uimanagerfragment);
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
-                    + " must implement LogoutDialogListener");
+            throw new ClassCastException("uimanagerfragment must implement LogoutDialogListener");
         }
     }
 }

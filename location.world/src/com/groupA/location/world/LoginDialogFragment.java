@@ -33,20 +33,6 @@ public class LoginDialogFragment extends DialogFragment{
 	    // Pass null as the parent view because its going in the dialog layout
 	    final View view = inflater.inflate(R.layout.login_dialog, null);
 	    
-	   /*    //Enter on password field tries to log in
-        passwdText.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                  // Perform action on key press
-                	logInButton(v);
-                  return true;
-                }
-                return false;
-            }
-        });*/
-	    
 
         TextView userIDText = (TextView) view.findViewById(R.id.username_field);
         TextView userPasswdText = (TextView) view.findViewById(R.id.password_field); 
@@ -102,13 +88,13 @@ public class LoginDialogFragment extends DialogFragment{
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (LoginDialogListener) activity;
+        	mListener = (LoginDialogListener) getFragmentManager().findFragmentById(R.id.uimanagerfragment);
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
-                    + " must implement LoginDialogListener");
+            // The user interface doesn't implement the interface, throw exception
+        	throw new ClassCastException("uimanagerfragment must implement LoginDialogListener");
         }
     }
+    
     private void hideKeyboard(View view) {
     	//If we were writing in some text field, forget about it
 		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
