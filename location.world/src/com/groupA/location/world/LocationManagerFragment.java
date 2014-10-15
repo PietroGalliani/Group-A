@@ -12,27 +12,58 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
+/**
+ *
+ * Deals contacts with Google Location Services
+ *
+ */
 public class LocationManagerFragment extends Fragment
 implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 	
+	/**
+	 * The activity that deals with the manager -- that is, MainActivity -- must 
+	 * implement the following functions:
+	 */
 	public interface LocationManagerListener {
+		/**
+		 * The current location changed
+		 * @param location
+		 */
 		public void onLocationChanged(Location location); 
-		public void onLocManConnected();
-		public void onLocManDisconnected();
+		/**
+		 * The location services are now available
+		 */
+		public void onLocationAvailable();
+		/**
+		 * The location services are now unavailable
+		 */
+		public void onLocationUnavailable();	
+
 	}
 	
-    // These settings are the same as the settings for the map. They will in fact give you updates
-    // at the maximal rates currently possible.
+	/**
+	 * An instance of the interface, to call its functions when necessary.
+	 */
+	LocationManagerListener mListener;
+
+	/**
+	 * Settings for location updates. Do not decrease further, they are already as low as possible.
+	 */
     private static final LocationRequest REQUEST = LocationRequest.create()
             .setInterval(5000)         // 5 seconds
             .setFastestInterval(16)    // 16ms = 60fps
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-	
-	LocationManagerListener mListener;
-
+    
+    
+	/**
+	 * The LocationClient connecting to Google's location services
+	 */
 	private LocationClient mLocationClient;
 
 	
+	/**
+	 * Set up the location client (if it is not set up already)
+	 */
 	 private void setUpLocationClientIfNeeded() {
 	        if (mLocationClient == null) {
 	            mLocationClient = new LocationClient(
@@ -42,21 +73,33 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 	        }
 	    }
 
+	 /**
+	  * 
+	  * @return the current location
+	  */
 	 public Location getLocation(){
 		 return mLocationClient.getLastLocation();
 	 }
 
+	 /*
+	  * If the location changes, pass this information back to the main activity
+	  */
 	@Override
 	public void onLocationChanged(Location location) {
-		// If the location changes, pass this information back to MainActivity
 		mListener.onLocationChanged(location);
 	}
 
+	/*
+	 * If the connection failed, do nothing for now (later will add it to the interface, let the main activity handle it)
+	 */
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
-		// do nothing (for now)
+		//do nothing (for now)
 	}
 
+	/*
+	 * If you are now connected, tell the main activity so
+	 */
 	@Override
 	public void onConnected(Bundle arg0) {
 		// when connected, set up the client and inform MainActivity
@@ -65,32 +108,47 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 		
 		getLocation();
 		
-		mListener.onLocManConnected();
+		mListener.onLocationAvailable();
 	}
-
+	/*
+	 * If you are now connected, tell the main activity so
+	 */
 	@Override
 	public void onDisconnected() {
-		// do nothing (for now)
-		mListener.onLocManDisconnected();
+		mListener.onLocationUnavailable();
 	}
 
+	/*
+	 * If the app is being paused, disconnect
+	 */
+	 @Override
+	 public void onPause() {
+		 super.onPause();
+	     if (mLocationClient != null) {
+	    	 mLocationClient.disconnect();
+	     }
+	 }
+	 
+	/*
+	 * If the app is being resumed, reconnect
+	 */
 	@Override
     public void onResume() {
         super.onResume();
         setUpLocationClientIfNeeded();	        
         mLocationClient.connect();
     }
+
 	
-	 @Override
-	    public void onPause() {
-	    	super.onPause();
-	        if (mLocationClient != null) {
-	            mLocationClient.disconnect();
-	        }
-	    }
-	
-	 // Override the Fragment.onAttach() method to instantiate the listener
-    @Override
+	/**
+     * This gets called when the class is instantiated. It checks that 
+     * the main activity implements the interface LocationManagerListener; and if 
+     * so, it stores that implementation in mListener (to be able to invoke
+     * it if necessary). 
+     * 
+     * Otherwise, it raises an exception.
+     */
+	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         // Verify that the host activity implements the callback interface
