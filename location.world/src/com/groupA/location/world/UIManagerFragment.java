@@ -287,4 +287,32 @@ public class UIManagerFragment extends Fragment
 		errorDialog.mTitle="Logout Failed";
 		errorDialog.show(getFragmentManager(), "LogoutFailDialogFragment");	  
 	}
+	
+	/**
+	 * Location services are unavailable, display an error message. 
+	 */
+	public void noLocationServices() {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+		errorDialog.mMessage="Location Services Unavailable"; 
+		errorDialog.mTitle="No Location Services";
+		errorDialog.show(getFragmentManager(), "NoLocationDialogFragment");	  
+	}
+	
+	/**
+	 * Map is unavailable, display an error message. 
+	 */
+	public void noMapServices() {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+		errorDialog.mMessage="Google Map Services Unavailable"; 
+		errorDialog.mTitle="No Map";
+		errorDialog.show(getFragmentManager(), "NoLocationDialogFragment");	  
+	}
+	
+	public void posNoMap(){
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+		errorDialog.mMessage="Tried to move to positions while Map Services unavailable"; 
+		errorDialog.mTitle="No Map";
+		errorDialog.show(getFragmentManager(), "NoLocationDialogFragment");	 
+	}
+	
 }

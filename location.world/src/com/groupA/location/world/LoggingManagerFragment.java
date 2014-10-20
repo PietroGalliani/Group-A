@@ -121,7 +121,8 @@ public class LoggingManagerFragment extends Fragment {
      * @param location
      */
     public void receiveLoc(Location location) {
-    	mLoggingClient.logCoords(getActivity(), location);
+    	if (location != null)
+    		mLoggingClient.logCoords(getActivity(), location);
     }
     
     

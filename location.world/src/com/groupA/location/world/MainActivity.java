@@ -2,6 +2,7 @@ package com.groupA.location.world;
 
 import com.groupA.location.world.LocationManagerFragment.LocationManagerListener;
 import com.groupA.location.world.LoggingManagerFragment.LoggingManagerListener;
+import com.groupA.location.world.MapManagerFragment.MapManagerListener;
 import com.groupA.location.world.UIManagerFragment.UIListener;
 
 import android.location.Location;
@@ -18,7 +19,7 @@ import android.support.v4.app.FragmentTransaction;
  *
  */
 public class MainActivity extends FragmentActivity
-implements  LocationManagerListener, UIListener, LoggingManagerListener {
+implements  LocationManagerListener, UIListener, MapManagerListener, LoggingManagerListener {
 		
 	 /*
 	  * These fragments manage the user interface, the map, the location services and the 
@@ -164,7 +165,7 @@ implements  LocationManagerListener, UIListener, LoggingManagerListener {
 	     */
 	    @Override
 	    public void onLocationChanged(Location location) {
-	    	mapManager.goToPosition(location);
+	    	goToCurrentPosition();
 	    }
 
 	    /**
@@ -189,6 +190,12 @@ implements  LocationManagerListener, UIListener, LoggingManagerListener {
 		public void onLocationUnavailable() {
 			loggingManager.locationIsUnavailable();
 		}
+		
+		@Override
+	    public void  onNoLocationServices() {
+	    	loggingManager.locationIsUnavailable();
+	    	uiManager.noLocationServices();
+	    }
 	    
 	    /* 4. Logging Manager handling functions */
 	    
@@ -220,8 +227,8 @@ implements  LocationManagerListener, UIListener, LoggingManagerListener {
 	    public void goToCurrentPosition()
 	    {
 	    	Location location = locationManager.getLocation();
-	    	mapManager.goToPosition(location);
-	   
+	    	if (mapManager.map_available() && location != null)
+	    		mapManager.goToPosition(location);
 	    }
 
 	    
@@ -241,7 +248,22 @@ implements  LocationManagerListener, UIListener, LoggingManagerListener {
 	     */
 	    public void logPosition() {
 			Location mLocation = locationManager.getLocation();
-			loggingManager.receiveLoc(mLocation);
+			if (mLocation != null) {
+				loggingManager.receiveLoc(mLocation);
+			}
 	    }
-	    
+
+	    /**
+	     * Google Map services cannot be reached
+	     */
+		@Override
+		public void onMapUnavailable() {
+			uiManager.noMapServices();
+		}
+
+		@Override
+		public void onGoToPosNoMap() {
+			uiManager.posNoMap();
+		}
+	    	    
 }

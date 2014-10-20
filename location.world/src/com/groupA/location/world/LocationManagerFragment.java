@@ -39,6 +39,10 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 		 */
 		public void onLocationUnavailable();	
 
+		/**
+		 * Location Services not available
+		 */
+		public void onNoLocationServices();
 	}
 	
 	/**
@@ -59,7 +63,14 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 	 * The LocationClient connecting to Google's location services
 	 */
 	private LocationClient mLocationClient;
+	
+	/**
+	 * Are the location services available? 
+	 */
 
+	/*public boolean location_available() {
+		return (mLocationClient != null);
+	}*/
 	
 	/**
 	 * Set up the location client (if it is not set up already)
@@ -78,7 +89,11 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 	  * @return the current location
 	  */
 	 public Location getLocation(){
-		 return mLocationClient.getLastLocation();
+		 Location loc =  mLocationClient.getLastLocation();
+		 if (loc == null) {
+			 mListener.onNoLocationServices();
+		 }
+		 return loc;
 	 }
 
 	 /*
@@ -94,7 +109,8 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 	 */
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
-		//do nothing (for now)
+		//do nothing (for now)	
+		mListener.onLocationUnavailable();
 	}
 
 	/*
@@ -106,7 +122,7 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 		
 		mLocationClient.requestLocationUpdates(REQUEST, this);
 		
-		getLocation();
+		//getLocation();
 		
 		mListener.onLocationAvailable();
 	}
