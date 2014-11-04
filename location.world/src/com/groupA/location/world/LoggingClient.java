@@ -1,9 +1,18 @@
 package com.groupA.location.world;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+
 import android.content.Context;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.Toast;
 
 /*Implements Parcelable in order to be able to save and restore its state if necessary (e.g. if the tablet is rotated)*/
@@ -20,7 +29,7 @@ import android.widget.Toast;
  * be forgotten when you rotate your device or pause-unpause your app!  
  *
  */
-public class LoggingClient implements Parcelable{
+public class LoggingClient extends AsyncTask<String, Void, String> implements Parcelable{
 	
 	/* Just some constants for returning errors and the like. 
 	Perhaps using exceptions would be better, but let's get this to work first.*/
@@ -67,21 +76,21 @@ public class LoggingClient implements Parcelable{
 	 * @return the outcome of the login attempt
 	 * **/
 	public int logIn(String name, String password){
-		if (logged == false) { 
-			if ((name.equals("aaa") && password.equals("aaa")) || (name.equals("bbb") && password.equals("bbb")) || (password.equals("ccc"))) {
-				logged = true;
-				mUserID = name;
-				return LOGIN_OK;
-			} else
-				return WRONG_PASSWD;
-		}
-		else 
-			return ALREADY_LOGGED; 
+		
+			
+			this.execute(name,password);
+	
+			if (logged == false) {
+			return LOGIN_OK;
+		} else{
+			return WRONG_PASSWD;}
+
 	}
 
 	/**
 	 * Logs out. 
-	 * @return the outcome of the logout attempt
+	 * @retu
+	 * rn the outcome of the logout attempt
 	 */
 	public int logOut(){
 		logged = false;
@@ -146,4 +155,48 @@ public class LoggingClient implements Parcelable{
     	}
     };
 
+	@Override
+	protected String doInBackground(String... params) {
+		// TODO Auto-generated method stub
+		 try{
+	            String username = (String)params[0];
+	            String pass = (String)params[1];
+	            String link="http://54.77.125.52/app/WebserverProto.php";
+	            String data  = URLEncoder.encode("username", "UTF-8") 
+	            + "=" + URLEncoder.encode(username, "UTF-8");
+	            data += "&" + URLEncoder.encode("password", "UTF-8") 
+	            + "=" + URLEncoder.encode(pass, "UTF-8");
+	            URL url = new URL(link);
+	            URLConnection conn = url.openConnection(); 
+	            conn.setDoOutput(true); 
+	            OutputStreamWriter wr = new OutputStreamWriter
+	            (conn.getOutputStream()); 
+	            wr.write( data ); 
+	            wr.flush(); 
+	            BufferedReader reader = new BufferedReader
+	            (new InputStreamReader(conn.getInputStream()));
+	            StringBuilder sb = new StringBuilder();
+	            String line = null;
+	  	        this.logged = true;
+	            // Read Server Response
+	            while((line = reader.readLine()) != null)
+	            {
+	               sb.append(line);
+	               break;
+	            }
+	              return sb.toString();
+	         }catch(Exception e){
+	        	Log.e("exception","login", e);
+	      
+	            return e.getMessage();
+	         }
+		
+	
+	}
+	   @Override
+	   protected void onPostExecute(String result){
+		   
+
+	      this.mUserID = result;
+	   }
 }
