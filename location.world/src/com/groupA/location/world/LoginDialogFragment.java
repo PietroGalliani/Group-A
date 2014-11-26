@@ -11,6 +11,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 /**
@@ -35,7 +37,8 @@ public class LoginDialogFragment extends DialogFragment{
 		 * @param userID the user's ID
 		 * @param password the user's password
 		 */
-		public void onLoginDialogLogin(String userID, String password); 
+		public void onLoginDialogLogin(int charSelected, String userID, String password);
+		public void onRegisterButton(String userID);
 	}
 	
 	/**
@@ -79,6 +82,8 @@ public class LoginDialogFragment extends DialogFragment{
 	     */
         TextView userIDText = (TextView) view.findViewById(R.id.username_field);
         TextView userPasswdText = (TextView) view.findViewById(R.id.password_field); 
+        
+
 
         /*
          * Initialize the user id field with the id used in the previous, failed attempt (if any).
@@ -130,6 +135,14 @@ public class LoginDialogFragment extends DialogFragment{
 						}
 					}
 				)
+				//Add a "register" button
+				.setNeutralButton("Register", new DialogInterface.OnClickListener(){
+					public void onClick(DialogInterface dialog, int id){
+						TextView userIDText = (TextView) view.findViewById(R.id.username_field);
+						String userID = userIDText.getText().toString();
+						mListener.onRegisterButton(userID);
+					}
+				})
 				
 				/*
 				 * If the user clicks enter on the keyboard when they are in the password field, 
@@ -202,6 +215,17 @@ public class LoginDialogFragment extends DialogFragment{
      * @param view
      */
     public void returnIDPasswd(DialogInterface dialog, View view) {
+    	RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup1);
+        
+        int charSelected = -1;
+        
+        switch(radioGroup.getCheckedRadioButtonId()) {
+        case R.id.radio1: charSelected = 1; break;
+        case R.id.radio2: charSelected = 2; break;
+        case R.id.radio3: charSelected = 3; break;
+        default: charSelected = 4; break;
+        }
+                
     	/**
     	 * Find the user id, password fields
     	 */
@@ -211,7 +235,7 @@ public class LoginDialogFragment extends DialogFragment{
         /**
          * Tell the user interface of the id/password combination
          */
-		mListener.onLoginDialogLogin(userIDText.getText().toString(), userPasswdText.getText().toString());
+		mListener.onLoginDialogLogin(charSelected, userIDText.getText().toString(), userPasswdText.getText().toString());
 		
 		/**
 		 * Hide the keyboard

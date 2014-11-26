@@ -1,16 +1,23 @@
 package com.groupA.location.world;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.groupA.location.world.LoginDialogFragment.LoginDialogListener;
 import com.groupA.location.world.LogoutDialogFragment.LogoutDialogListener;
+import com.groupA.location.world.RegisterDialogFragment.RegisterDialogListener;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 
@@ -21,7 +28,7 @@ import android.widget.Button;
  *
  */
 public class UIManagerFragment extends Fragment 
-	implements OnClickListener, LoginDialogListener, LogoutDialogListener{
+	implements OnClickListener, LoginDialogListener, LogoutDialogListener, RegisterDialogListener{
 	
 	/**
 	 * Public interface for the UI to communicate with the main activity.
@@ -33,7 +40,7 @@ public class UIManagerFragment extends Fragment
 		 * @param userID The id entered by the user
 		 * @param password The password entered by the user (do _not_ store!)
 		 */
-		public void onLogInCommand(String userID, String password);
+		public void onLogInCommand(int CharSelected, String userID, String password);
 		
 		/**
 		 * This is invoked if the user is attempting to log out.
@@ -44,6 +51,17 @@ public class UIManagerFragment extends Fragment
 		 * This is invoked if the user wants to log their position. 
 		 */
 		public void onLogPositionCommand();
+		
+		public void onAddBeacon(LatLng point);
+
+		public void onAddTarget(LatLng point);
+
+		public void onAddOthers(LatLng point);
+
+		public void onCastButtonPressed();
+		
+		public void onRegisterRequest(int charSelected, String userID, String password);
+
 	}
 	
 	/**
@@ -58,7 +76,14 @@ public class UIManagerFragment extends Fragment
 	 * 
 	 * If you change its value, call updateUI() afterwards to update the look of the interface.
 	 */
-	public boolean logged_in_UI = false; 
+	
+	public static final int NOT_LOGGED = 0;
+	public static final int LOGGING = 1; 
+	public static final int LOGGED_IN = 2; 
+	
+	public int status_UI = NOT_LOGGED;
+	//public boolean logged_in_UI = false; 
+	
 	
 	/**
 	 * The name of the user, as shown by the interface. 
@@ -70,8 +95,9 @@ public class UIManagerFragment extends Fragment
 	/**
 	 * Handlers for the buttons. 
 	 */
-    private Button logOutButton, logPosButton, logInButton;
-	
+    private Button logOutButton, logPosButton, logInButton, castButton;
+    private RadioGroup radioGroup;
+	private TextView loggingText;
     
     /**
      * This function gets called when the fragment is set up by the function setUpUI() in 
@@ -100,10 +126,11 @@ public class UIManagerFragment extends Fragment
          * as required.
          */
         if (savedInstanceState != null) {
-      	  logged_in_UI = savedInstanceState.getBoolean("loggedInUI");
+      	  status_UI = savedInstanceState.getInt("status");
       	  userID_UI = savedInstanceState.getString("userIDUI");
           update_UI();
-        }
+ //         Toast.makeText(uiView.getContext(), "Restoring: logged in = " + logged_in_UI + ", user ID = " + userID_UI, Toast.LENGTH_SHORT).show();
+        }                
         return uiView;
     }
 	
@@ -125,7 +152,14 @@ public class UIManagerFragment extends Fragment
 
         logInButton = (Button) uiView.findViewById(R.id.login_dialog_button);
         logInButton.setOnClickListener(this);
-		
+        
+        castButton = (Button) uiView.findViewById(R.id.castButton);
+        castButton.setOnClickListener(this);
+        
+        radioGroup = (RadioGroup) uiView.findViewById(R.id.radioGroup);		
+        
+        loggingText = (TextView) uiView.findViewById(R.id.loggingOnMessage);
+        
 	}
 	
 	/**
@@ -139,9 +173,16 @@ public class UIManagerFragment extends Fragment
 	    	openLoginDialog();
 	    if (view == logPosButton) 
 	    	logPosButtonPressed();
+	    if (view == castButton)
+	    	castButtonPressed();
 	    	
 	}
 	
+	private void castButtonPressed() {
+		// TODO Auto-generated method stub
+		mListener.onCastButtonPressed();
+	}
+
 	/**
 	 * This gets called when the application is being paused or rotated. 
 	 * Saves the values of logged_in_UI (that is, if you are logged in or not) 
@@ -150,7 +191,7 @@ public class UIManagerFragment extends Fragment
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("loggedInUI", logged_in_UI);
+        outState.putInt("status", status_UI);
         outState.putString("userIDUI", userID_UI);
     }
 	
@@ -159,6 +200,8 @@ public class UIManagerFragment extends Fragment
 	 * main activity that it should send the position to the client.
 	 */
     public void logPosButtonPressed() {
+        //Toast.makeText(view.getContext(), "logged in = " + logged_in_UI + ", CheckedID = " + radioGroup.getCheckedRadioButtonId()
+        //		 + ", beacon = " + R.id.button_beacon + ", target = " + R.id.button_target, Toast.LENGTH_SHORT).show();
     	mListener.onLogPositionCommand();
     }
     
@@ -177,8 +220,10 @@ public class UIManagerFragment extends Fragment
      * and chose to log in. In that case, we just pass this information back to the activity. 
      */
     @Override
-    public void onLoginDialogLogin(String userID, String password) {
-    	mListener.onLogInCommand(userID, password);
+    public void onLoginDialogLogin(int charSelected, String userID, String password) {
+    	status_UI = LOGGING; 
+    	update_UI();
+    	mListener.onLogInCommand(charSelected, userID, password);
     }
     
     /**
@@ -187,7 +232,7 @@ public class UIManagerFragment extends Fragment
      * @param userID The ID of the user, to display. 
      */
     public void loginSucceeded(String userID) {
-    	logged_in_UI = true;
+    	status_UI = LOGGED_IN;
     	userID_UI = userID; 
     	update_UI();
     }
@@ -197,17 +242,48 @@ public class UIManagerFragment extends Fragment
      * depending on the value of the variable logged_in_UI.
      */
     public void update_UI(){
-    	if (logged_in_UI) {
+    	switch(status_UI) {
+    		case NOT_LOGGED:
+    			logInButton.setVisibility(View.VISIBLE);
+            	logOutButton.setVisibility(View.INVISIBLE);
+            	logPosButton.setVisibility(View.INVISIBLE);
+            	radioGroup.setVisibility(View.INVISIBLE);	
+        	break;
+    		case LOGGED_IN: 
+    			logInButton.setVisibility(View.INVISIBLE);
+            	logOutButton.setVisibility(View.VISIBLE);
+            	logPosButton.setVisibility(View.VISIBLE);
+            	logOutButton.setText("Log Out (" + userID_UI +")");	
+            	radioGroup.setVisibility(View.VISIBLE);
+            	loggingText.setVisibility(View.INVISIBLE);
+            break;
+    		case LOGGING: 
+    			logInButton.setVisibility(View.INVISIBLE);
+            	logOutButton.setVisibility(View.INVISIBLE);
+            	logPosButton.setVisibility(View.INVISIBLE);
+            	radioGroup.setVisibility(View.INVISIBLE);
+            	loggingText.setVisibility(View.VISIBLE);
+            break;
+    		default: 
+				ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+				errorDialog.mMessage= "UI status " + status_UI + " not recognized";
+				errorDialog.mTitle="Error";
+				errorDialog.show(getFragmentManager(), "NoBeaconOrTargetDialogFragment");	
+			}
+    	}
+    	/*if (logged_in_UI) {
     		logInButton.setVisibility(View.INVISIBLE);
         	logOutButton.setVisibility(View.VISIBLE);
         	logPosButton.setVisibility(View.VISIBLE);
         	logOutButton.setText("Log Out (" + userID_UI +")");	
+        	radioGroup.setVisibility(View.VISIBLE);
     	} else {
     		logInButton.setVisibility(View.VISIBLE);
         	logOutButton.setVisibility(View.INVISIBLE);
         	logPosButton.setVisibility(View.INVISIBLE);
+        	radioGroup.setVisibility(View.INVISIBLE);
     	}
-    }
+    }*/
     
     /**
      * The login attempt failed: open the login dialog again, with the userID of the previous 
@@ -215,13 +291,13 @@ public class UIManagerFragment extends Fragment
      * 
      * @param userID the user ID used in the failed login attempt.
      */
-    public void loginFailed(String userID) {
+    public void loginFailed(String userID, String message) {
     	LoginDialogFragment loginDialog = new LoginDialogFragment();
     	loginDialog.mID = userID; 
     	loginDialog.show(getFragmentManager(), "OpenLoginDialogFragment");
     	
     	ErrorDialogFragment errorDialog = new ErrorDialogFragment();
-    	errorDialog.mMessage="The User ID/Password combination has not been found. Please correct and retry."; 
+    	errorDialog.mMessage=message; 
     	errorDialog.mTitle="Login Failed";
     	errorDialog.show(getFragmentManager(), "LoginErrorDialogFragment");
     }
@@ -271,7 +347,7 @@ public class UIManagerFragment extends Fragment
 	 * The logout attempt was successful, update the user interface as required. 
 	 */
 	public void logoutSucceeded(){
-		logged_in_UI = false;
+		status_UI = NOT_LOGGED;
 		userID_UI = "";		
 		update_UI();
 	}
@@ -305,14 +381,60 @@ public class UIManagerFragment extends Fragment
 		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
 		errorDialog.mMessage="Google Map Services Unavailable"; 
 		errorDialog.mTitle="No Map";
-		errorDialog.show(getFragmentManager(), "NoLocationDialogFragment");	  
+		errorDialog.show(getFragmentManager(), "NoMapDialogFragment");	  
 	}
 	
 	public void posNoMap(){
 		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
 		errorDialog.mMessage="Tried to move to positions while Map Services unavailable"; 
 		errorDialog.mTitle="No Map";
-		errorDialog.show(getFragmentManager(), "NoLocationDialogFragment");	 
+		errorDialog.show(getFragmentManager(), "NoMapDialogFragment");	 
 	}
-	
-}
+
+	public void mapClicked(LatLng point) {
+		if (status_UI == LOGGED_IN) {
+			int r = radioGroup.getCheckedRadioButtonId();
+			switch(r){
+			case R.id.button_beacon : mListener.onAddBeacon(point); break;
+			case R.id.button_target : mListener.onAddTarget(point); break; 
+			case R.id.button_others : mListener.onAddOthers(point); break;
+			
+			default: 
+				ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+				errorDialog.mMessage= "Select first what you want to add";
+				errorDialog.mTitle="Error";
+				errorDialog.show(getFragmentManager(), "NoBeaconOrTargetDialogFragment");	
+			}
+		}
+	}
+
+	@Override
+	public void onRegisterButton(String userID) {
+		RegisterDialogFragment regDialog = new RegisterDialogFragment();
+		regDialog.mID = userID;
+		regDialog.show(getFragmentManager(), "OpenRegDialogFragment");
+	}
+
+	@Override
+	public void onRegisterRequest(int charSelected, String userID,
+			String password) {
+		mListener.onRegisterRequest(charSelected, userID, password);
+	}
+
+	public void registration_failed(String userID, String message) {
+		RegisterDialogFragment regDialog = new RegisterDialogFragment();
+    	regDialog.mID = userID; 
+    	regDialog.show(getFragmentManager(), "OpenRegDialogFragment");	
+    	
+    	ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage=message; 
+    	errorDialog.mTitle="Registration Failed";
+    	errorDialog.show(getFragmentManager(), "RegErrorDialogFragment");
+	}
+
+	public void registration_succeeded() {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage="You are now registered. Press OK to login"; 
+    	errorDialog.mTitle="Registration Succeeded";
+	}
+} 

@@ -3,35 +3,81 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <Button
-            android:id="@+id/log_out_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/log_position_button"
-            android:padding="8dp"
-            android:text="@string/logout_text"
-            android:visibility="invisible" />
+        android:id="@+id/log_out_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/log_position_button"
+        android:padding="8dp"
+        android:text="@string/logout_text"
+        android:visibility="invisible" />
 
-        <Button
-            android:id="@+id/login_dialog_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/log_out_button"
-            android:text="@string/login_button_text" />
+    <Button
+        android:id="@+id/login_dialog_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/login_button_text" />
 
-        <Button
-            android:id="@+id/log_position_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:padding="8dp"
-            android:text="@string/logpos_text"
-            android:visibility="invisible" />
+    <Button
+        android:id="@+id/log_position_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:padding="8dp"
+        android:text="@string/logpos_text"
+        android:visibility="invisible" />
 
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" 
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:visibility="invisible"   >
+        
+    <RadioButton
+        android:id="@+id/button_target"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Target" />
+    
+    <RadioButton
+        android:id="@+id/button_beacon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Beacon" />
+<RadioButton
+        android:id="@+id/button_others"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Other Players" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/castButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="Cast"
+        android:visibility = "visible" />
+
+    <TextView
+        android:id="@+id/loggingOnMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/log_out_button"
+        android:layout_alignBottom="@+id/log_out_button"
+        android:layout_alignParentLeft="true"
+        android:text="Logging in..."
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+        android:visibility = "invisible"/>
+    
 </RelativeLayout>

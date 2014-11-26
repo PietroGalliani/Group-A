@@ -1,5 +1,9 @@
 package com.groupA.location.world;
 
+import java.util.List;
+import java.util.Random;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.groupA.location.world.LocationManagerFragment.LocationManagerListener;
 import com.groupA.location.world.LoggingManagerFragment.LoggingManagerListener;
 import com.groupA.location.world.MapManagerFragment.MapManagerListener;
@@ -10,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 /**
  * 
@@ -29,6 +34,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	 MapManagerFragment mapManager;  
 	 LocationManagerFragment locationManager;
 	 LoggingManagerFragment loggingManager;
+	 CreaturesManager creatureManager;
+	 
+	 Random randomGenerator;
 	 
 	 /*
 	  * The functions of this class are divided in five class as follows: 
@@ -60,9 +68,11 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	        super.onCreate(savedInstanceState);
 	        setContentView(R.layout.activity_main); //Load the activity_main.xml layout file
 	        setUpUI();
+	        setUpCManager(savedInstanceState);
 	        setUpMapManager();
 	        setUpLocationManager();
 	        setUpLoggingManager();
+	        randomGenerator = new Random();
 	    }
 	    
 	    /**
@@ -116,6 +126,23 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    		 locationManager = (LocationManagerFragment) locmanager;
 	    }
 	    
+	    public void setUpCManager(Bundle savedInstanceState){
+	    	if (savedInstanceState == null) {
+	    		creatureManager = new CreaturesManager();
+	    	} else {
+	    		creatureManager = savedInstanceState.getParcelable("cManager");	    		
+	    	}
+	    }
+	    
+	    /**
+	     * We are pausing the app, save our data
+	     */
+	    @Override
+	    public void onSaveInstanceState(Bundle outState) {
+	        super.onSaveInstanceState(outState);
+	        outState.putParcelable("cManager", creatureManager);
+	    }
+	    
 	    /* 2. User Interface handling functions */ 
 	    
 	    /**
@@ -125,13 +152,8 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	     * was successful or not.
 	     */
 	    @Override
-	    public void onLogInCommand(String userID, String password) {
-	    	int result = loggingManager.logIn(userID, password);
-	    	if (result == LoggingClient.LOGIN_OK) 		    		
-	    		uiManager.loginSucceeded(userID);
-	    	else 
-	    		uiManager.loginFailed(userID);
-	    	
+	    public void onLogInCommand(int charSelected, String userID, String password) {
+	    	loggingManager.logIn(charSelected, userID, password);
 	    }
 	    
 	    /**
@@ -140,11 +162,14 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	     */
 	    @Override
 	    public void onLogPositionCommand() {
+			/*creatureManager.step();
+			mapManager.updateGraphics();*/
+	    	mapManager.startAnimating();
 	    	logPosition();
 	    }
 	    
 		/**
-		 * The user told the UI that they want to log out; do that, tell the 
+		 * T+he user told the UI that they want to log out; do that, tell the 
 		 * user interface whether the logout was successful
 		 */
 		@Override
@@ -154,6 +179,8 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    		uiManager.logoutSucceeded();
 	    	} else 
 	    		uiManager.logoutFailed();
+	    	creatureManager.clear();
+	    	mapManager.updateGraphics();
 		}
 		
 		/* 3. Location Manager handling functions */
@@ -227,8 +254,10 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    public void goToCurrentPosition()
 	    {
 	    	Location location = locationManager.getLocation();
-	    	if (mapManager.map_available() && location != null)
+	    	if (mapManager.map_available() && location != null){
+	    		creatureManager.setCharacter(new LatLng(location.getLatitude(), location.getLongitude()));
 	    		mapManager.goToPosition(location);
+	    	}
 	    }
 
 	    
@@ -265,5 +294,122 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		public void onGoToPosNoMap() {
 			uiManager.posNoMap();
 		}
-	    	    
+
+		@Override
+		public void onMapClick(LatLng point) {
+			// TODO Auto-generated method stub
+			uiManager.mapClicked(point);
+		}
+
+		@Override
+		public void onAddBeacon(LatLng point) {
+			// TODO Auto-generated method stub
+			creatureManager.addBeacon(point);
+			
+		}
+
+		@Override
+		public List<Beacon> requestBeacons() {
+			// TODO Auto-generated method stub
+			//creatureManager.step();
+
+			return creatureManager.getBeacons();
+		}
+
+		@Override
+		public PlayerCharacter requestCharacter() {
+			// TODO Auto-generated method stub
+			return creatureManager.getCharacter();
+		}
+
+		@Override
+		public void onAddTarget(LatLng point) {
+			// TODO Auto-generated method stub
+			creatureManager.addTarget(point);
+		}
+
+		@Override
+		public List<Target> requestTargets() {
+			// TODO Auto-generated method stub
+			return creatureManager.getTargets();
+		}
+
+		@Override
+		public List<PlayerCharacter> requestOthers() {
+			// TODO Auto-generated method stub
+			return creatureManager.getOthers();
+		}
+
+		@Override
+		public void onAddOthers(LatLng point) {
+			// TODO Auto-generated method stub
+			/*ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+	    	errorDialog.mMessage="Coordinates: (" + point.latitude + ", " + point.longitude + ")" + 
+			"\n In total, we have " + creatureManager.mListOthers.size() + " people"; 
+	    	errorDialog.mTitle="Adding Player";
+	    	errorDialog.show(getSupportFragmentManager(), "LoginErrorDialogFragment");*/
+	    	
+			creatureManager.addOther(point, randomGenerator.nextInt(4)+1);
+		}
+
+		@Override
+		public void onTick() {
+			// TODO Auto-generated method stub
+			creatureManager.step();
+		}
+
+		@Override
+		public void onCastButtonPressed() {
+			// TODO Auto-generated method stub
+			LatLng point = creatureManager.castBeacons(); 
+			mapManager.showExplosion(point);
+			
+		}
+
+		@Override
+		public void onRegisterRequest(int charSelected, String userID,
+				String password) {
+			loggingManager.register(charSelected, userID, password);
+		}
+
+
+		@Override
+		public void onRegOK(int charSelected, String userID) {
+			uiManager.registration_succeeded();			
+    		creatureManager.pickCharacter(charSelected);	    		
+    		mapManager.updateGraphics();
+    		uiManager.loginSucceeded(userID);
+		}
+		
+		
+		
+		@Override
+		public void onLoginSucceeded(final int charSelected, final String userID) {
+		Log.d("debug", "main");
+		runOnUiThread(new Runnable(){
+		@Override
+		public void run() {
+		uiManager.loginSucceeded(userID);
+		creatureManager.mCharacter.pickIcon(charSelected);
+		mapManager.updateGraphics();
+		mapManager.startAnimating();
+		}
+		});
+		}
+		
+		@Override
+		public void onLoginFailed(final String userID, final String message) {
+		runOnUiThread(new Runnable(){
+		@Override
+		public void run() {
+		uiManager.loginFailed(userID, message);
+		}
+		});
+		}
+
+		@Override
+		public void onRegFailed(String userID, String message) {
+			uiManager.registration_failed(userID, message);
+		}
+   	    
 }
