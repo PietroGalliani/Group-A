@@ -9,6 +9,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.TextView;
 
 public class UpdateLocationActivity extends AsyncTask<Double, Void, String> {
@@ -23,16 +24,22 @@ public class UpdateLocationActivity extends AsyncTask<Double, Void, String> {
 	protected String doInBackground(Double... arg0) {
 		try {
 			int missionID = 1;
-			double longitude = (double) arg0[1];
-			double latitude = (double) arg0[2];
+			double longitude = (double) arg0[0];
+			double latitude = (double) arg0[1];
+			
+			
 			String link = "http://54.77.125.52/app/uploadLocation.php";
-			String data = URLEncoder.encode("longtitude", "UTF-8") + "="
-					+URLEncoder.encode(String.valueOf(longitude), "UTF-8") ;
+			String data = URLEncoder.encode("longitude", "UTF-8") + "="
+					+longitude;
 			data += "&" + URLEncoder.encode("latitude", "UTF-8") + "="
-					+URLEncoder.encode(String.valueOf(latitude), "UTF-8") ;
+					+latitude;
 			data += "&" + URLEncoder.encode("activity", "UTF-8") + "="
 					+ URLEncoder.encode(String.valueOf(missionID), "UTF-8");
+			data += "&" + URLEncoder.encode("username", "UTF-8") + "="
+					+ URLEncoder.encode("admin", "UTF-8");
+			
 			URL url = new URL(link);
+			
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
 			OutputStreamWriter wr = new OutputStreamWriter(
@@ -48,6 +55,7 @@ public class UpdateLocationActivity extends AsyncTask<Double, Void, String> {
 				sb.append(line);
 				break;
 			}
+			Log.e("debug", sb.toString());
 			return sb.toString();
 		} catch (Exception e) {
 			return new String("Exception: " + e.getMessage());

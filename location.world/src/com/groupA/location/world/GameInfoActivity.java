@@ -34,6 +34,7 @@ public class GameInfoActivity extends AsyncTask<String,Void,String>
 	}
 	
 	/**
+	 *  
 	*retreves all activities on the server, 
 	*information retreves contains activity name, activity ID 
 	*objective location and discription of activity
