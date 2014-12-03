@@ -14,13 +14,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
-public class LoginActivity extends AsyncTask<String,Void,String>{
-public interface LoginListener {
-void loginSucceeded(String userID);
-void loginFailed(String userID, String message);
+public class LogoutActivity extends AsyncTask<String,Void,String>{
+public interface LogoutListener {
+void logoutSucceeded();
+void logoutFailed(String message);
 }
-LoginListener mListener;
-public LoginActivity(LoginListener listener) {
+LogoutListener mListener;
+
+public LogoutActivity(LogoutListener listener) {
 mListener = listener;
 }
 protected void onPreExecute(){
@@ -30,12 +31,11 @@ protected String doInBackground(String... params) {
 // TODO Auto-generated method stub
 try{
 String username = (String)params[0];
-String pass = (String)params[1];
-String link="http://54.77.125.52/app/WebserverProto.php";
+String link="http://54.77.125.52/app/logout.php";
 String data = URLEncoder.encode("username", "UTF-8")
 + "=" + URLEncoder.encode(username, "UTF-8");
-data += "&" + URLEncoder.encode("password", "UTF-8")
-+ "=" + URLEncoder.encode(pass, "UTF-8");
+/*String data = URLEncoder.encode("username", "UTF-8")
++ "=" + URLEncoder.encode("GGggggggGGGGG", "UTF-8");*/
 URL url = new URL(link);
 URLConnection conn = url.openConnection();
 conn.setDoOutput(true);
@@ -54,12 +54,12 @@ sb.append(line);
 break;
 }
 if (sb.toString().equals(username)){
-Log.d("debug", sb.toString());
+Log.d("debug", "logout succeeded: " + sb.toString());
 Log.d("debug", username);
-mListener.loginSucceeded(sb.toString());
+mListener.logoutSucceeded();
 }
 else
-mListener.loginFailed(username, sb.toString());
+mListener.logoutFailed(sb.toString());
 Log.d("debug", sb.toString());
 return sb.toString();
 }catch(Exception e){

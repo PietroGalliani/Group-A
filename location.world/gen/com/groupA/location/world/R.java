@@ -1490,18 +1490,18 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f080028;
         public static final int action_menu_presenter=0x7f080029;
         public static final int action_mode_close_button=0x7f080036;
-        public static final int action_settings=0x7f080062;
+        public static final int action_settings=0x7f080063;
         public static final int activity_chooser_view_content=0x7f080037;
         public static final int always=0x7f08001e;
         public static final int beginning=0x7f080023;
         public static final int book_now=0x7f080010;
-        public static final int button_beacon=0x7f08005d;
-        public static final int button_others=0x7f08005e;
-        public static final int button_target=0x7f08005c;
+        public static final int button_beacon=0x7f08005e;
+        public static final int button_others=0x7f08005f;
+        public static final int button_target=0x7f08005d;
         public static final int buyButton=0x7f08000a;
         public static final int buy_now=0x7f08000f;
         public static final int buy_with_google=0x7f08000e;
-        public static final int castButton=0x7f08005f;
+        public static final int castButton=0x7f080060;
         public static final int checkbox=0x7f08003f;
         public static final int classic=0x7f080011;
         public static final int collapseActionView=0x7f080020;
@@ -1524,12 +1524,12 @@ containing a value of this type.
         public static final int image=0x7f080039;
         public static final int listMode=0x7f080014;
         public static final int list_item=0x7f08003b;
-        public static final int log_out_button=0x7f080058;
-        public static final int log_position_button=0x7f080059;
-        public static final int loggingOnMessage=0x7f080060;
-        public static final int login_dialog_button=0x7f08005a;
-        public static final int logpos_button=0x7f080061;
-        public static final int map=0x7f080057;
+        public static final int log_out_button=0x7f080059;
+        public static final int log_position_button=0x7f08005a;
+        public static final int loggingOnMessage=0x7f080061;
+        public static final int login_dialog_button=0x7f08005b;
+        public static final int logpos_button=0x7f080062;
+        public static final int map=0x7f080052;
         public static final int mapmanagerfragment=0x7f08004e;
         public static final int match_parent=0x7f08000c;
         public static final int middle=0x7f080024;
@@ -1538,16 +1538,17 @@ containing a value of this type.
         public static final int none=0x7f080000;
         public static final int normal=0x7f080001;
         public static final int password_field=0x7f080051;
+        public static final int password_field2=0x7f080053;
         public static final int production=0x7f080007;
         public static final int progress_circular=0x7f08002a;
         public static final int progress_horizontal=0x7f08002b;
         public static final int radio=0x7f080041;
-        public static final int radio1=0x7f080053;
-        public static final int radio2=0x7f080054;
-        public static final int radio3=0x7f080055;
-        public static final int radio4=0x7f080056;
-        public static final int radioGroup=0x7f08005b;
-        public static final int radioGroup1=0x7f080052;
+        public static final int radio1=0x7f080055;
+        public static final int radio2=0x7f080056;
+        public static final int radio3=0x7f080057;
+        public static final int radio4=0x7f080058;
+        public static final int radioGroup=0x7f08005c;
+        public static final int radioGroup1=0x7f080054;
         public static final int sandbox=0x7f080008;
         public static final int satellite=0x7f080002;
         public static final int search_badge=0x7f080044;
@@ -1773,12 +1774,14 @@ containing a value of this type.
          */
         public static final int common_signin_button_text_long=0x7f070018;
         public static final int hello_world=0x7f070028;
-        public static final int login_button_text=0x7f07002f;
+        public static final int login_button_text=0x7f070031;
         public static final int login_text=0x7f07002a;
         public static final int logout_text=0x7f07002b;
         public static final int logpos_text=0x7f07002c;
-        public static final int password_hint=0x7f07002e;
+        public static final int password_hint=0x7f07002f;
+        public static final int password_hint2=0x7f070030;
         public static final int username_hint=0x7f07002d;
+        public static final int username_hint2=0x7f07002e;
         /**  Text on a placeholder buy button when Google Play services is not
          available or up-to-date 
          */

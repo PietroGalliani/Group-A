@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -37,7 +36,8 @@ public class RegisterDialogFragment extends DialogFragment{
 		 * @param userID the user's ID
 		 * @param password the user's password
 		 */
-		public void onRegisterRequest(int charSelected, String userID, String password);
+		public void onRegisterDialogError(String userID, String message); 
+		public void onRegisterRequest(String userID, String password, int charSelected);
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public class RegisterDialogFragment extends DialogFragment{
 		 * dialogue which we are building 
 		 */
 	    LayoutInflater inflater = getActivity().getLayoutInflater();
-	    final View view = inflater.inflate(R.layout.login_dialog, null);
+	    final View view = inflater.inflate(R.layout.register_dialog, null);
 		builder.setView(view);		
 
 	    
@@ -206,7 +206,13 @@ public class RegisterDialogFragment extends DialogFragment{
      * @param view
      */
     public void returnIDPasswd(DialogInterface dialog, View view) {
-    	RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup1);
+                
+    	/**
+    	 * Find the user id, password fields
+    	 */
+        String userID = ((TextView) view.findViewById(R.id.username_field)).getText().toString();
+        String userPasswd = ((TextView) view.findViewById(R.id.password_field)).getText().toString();
+        String userPasswd2 = ((TextView) view.findViewById(R.id.password_field2)).getText().toString(); RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup1);
         
         int charSelected = -1;
         
@@ -216,18 +222,16 @@ public class RegisterDialogFragment extends DialogFragment{
         case R.id.radio3: charSelected = 3; break;
         default: charSelected = 4; break;
         }
-                
-    	/**
-    	 * Find the user id, password fields
-    	 */
-        TextView userIDText = (TextView) view.findViewById(R.id.username_field);
-        TextView userPasswdText = (TextView) view.findViewById(R.id.password_field);
+        
+        
         
         /**
          * Tell the user interface of the id/password combination
          */
-		mListener.onRegisterRequest(charSelected, userIDText.getText().toString(), userPasswdText.getText().toString());
-		
+        if (!userPasswd.equals(userPasswd2))	
+        	mListener.onRegisterDialogError(userID, "The passwords do not match");
+        else
+        	mListener.onRegisterRequest(userID, userPasswd, charSelected);
 		/**
 		 * Hide the keyboard
 		 */

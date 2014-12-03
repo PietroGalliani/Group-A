@@ -3,6 +3,10 @@ package com.groupA.location.world;
 import java.util.List;
 import java.util.Random;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.groupA.location.world.LocationManagerFragment.LocationManagerListener;
 import com.groupA.location.world.LoggingManagerFragment.LoggingManagerListener;
@@ -152,8 +156,8 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	     * was successful or not.
 	     */
 	    @Override
-	    public void onLogInCommand(int charSelected, String userID, String password) {
-	    	loggingManager.logIn(charSelected, userID, password);
+	    public void onLogInCommand(String userID, String password) {
+	    	loggingManager.logIn(userID, password);
 	    }
 	    
 	    /**
@@ -164,23 +168,29 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    public void onLogPositionCommand() {
 			/*creatureManager.step();
 			mapManager.updateGraphics();*/
-	    	mapManager.startAnimating();
+	    	//mapManager.startAnimating();
 	    	logPosition();
+	    	downloadPositions();
 	    }
 	    
+		private void downloadPositions() {
+			loggingManager.downloadOthers();
+		}
+
 		/**
 		 * T+he user told the UI that they want to log out; do that, tell the 
 		 * user interface whether the logout was successful
 		 */
 		@Override
 		public void onLogOutCommand() {
-			int result = loggingManager.logOut();
+			loggingManager.logOut();
+			/*int result = loggingManager.logOut();
 	    	if (result == LoggingClient.LOGOUT_OK) {
 	    		uiManager.logoutSucceeded();
 	    	} else 
 	    		uiManager.logoutFailed();
 	    	creatureManager.clear();
-	    	mapManager.updateGraphics();
+	    	mapManager.updateGraphics();*/
 		}
 		
 		/* 3. Location Manager handling functions */
@@ -297,20 +307,17 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 
 		@Override
 		public void onMapClick(LatLng point) {
-			// TODO Auto-generated method stub
 			uiManager.mapClicked(point);
 		}
 
 		@Override
 		public void onAddBeacon(LatLng point) {
-			// TODO Auto-generated method stub
 			creatureManager.addBeacon(point);
 			
 		}
 
 		@Override
 		public List<Beacon> requestBeacons() {
-			// TODO Auto-generated method stub
 			//creatureManager.step();
 
 			return creatureManager.getBeacons();
@@ -318,31 +325,26 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 
 		@Override
 		public PlayerCharacter requestCharacter() {
-			// TODO Auto-generated method stub
 			return creatureManager.getCharacter();
 		}
 
 		@Override
 		public void onAddTarget(LatLng point) {
-			// TODO Auto-generated method stub
 			creatureManager.addTarget(point);
 		}
 
 		@Override
 		public List<Target> requestTargets() {
-			// TODO Auto-generated method stub
 			return creatureManager.getTargets();
 		}
 
 		@Override
 		public List<PlayerCharacter> requestOthers() {
-			// TODO Auto-generated method stub
 			return creatureManager.getOthers();
 		}
 
 		@Override
 		public void onAddOthers(LatLng point) {
-			// TODO Auto-generated method stub
 			/*ErrorDialogFragment errorDialog = new ErrorDialogFragment();
 	    	errorDialog.mMessage="Coordinates: (" + point.latitude + ", " + point.longitude + ")" + 
 			"\n In total, we have " + creatureManager.mListOthers.size() + " people"; 
@@ -354,43 +356,44 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 
 		@Override
 		public void onTick() {
-			// TODO Auto-generated method stub
 			creatureManager.step();
 		}
 
 		@Override
 		public void onCastButtonPressed() {
-			// TODO Auto-generated method stub
 			LatLng point = creatureManager.castBeacons(); 
 			mapManager.showExplosion(point);
 			
 		}
 
 		@Override
-		public void onRegisterRequest(int charSelected, String userID,
-				String password) {
-			loggingManager.register(charSelected, userID, password);
+		public void onRegisterRequest(String userID,
+				String password, int charSelected) {
+			loggingManager.register(userID, password, charSelected);
 		}
 
 
 		@Override
-		public void onRegOK(int charSelected, String userID) {
-			uiManager.registration_succeeded();			
-    		creatureManager.pickCharacter(charSelected);	    		
-    		mapManager.updateGraphics();
-    		uiManager.loginSucceeded(userID);
+		public void onRegOK(final String userID) {
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					uiManager.registration_succeeded(userID);			
+					mapManager.updateGraphics();
+					uiManager.loginSucceeded(userID);
+				}});
 		}
 		
 		
 		
 		@Override
-		public void onLoginSucceeded(final int charSelected, final String userID) {
+		public void onLoginSucceeded(final String userID) {
 		Log.d("debug", "main");
 		runOnUiThread(new Runnable(){
 		@Override
 		public void run() {
 		uiManager.loginSucceeded(userID);
-		creatureManager.mCharacter.pickIcon(charSelected);
+		loggingManager.downloadOthers();
 		mapManager.updateGraphics();
 		mapManager.startAnimating();
 		}
@@ -410,6 +413,64 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		@Override
 		public void onRegFailed(String userID, String message) {
 			uiManager.registration_failed(userID, message);
+		}
+
+		@Override
+		public void onLogoutSucceded() {
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					uiManager.logoutSucceeded();
+					creatureManager.clear();
+					mapManager.updateGraphics();
+				}
+			});
+		}
+
+		@Override
+		public void onLogoutFailed(final String message) {
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					uiManager.logoutFailed(message);
+					creatureManager.clear();
+					mapManager.updateGraphics();
+				}
+			});
+		}
+
+		@Override
+		public void onSendLocationFailed(final String message) {
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					uiManager.sendLocationFailed(message);
+				}
+			});
+		}
+
+		@Override
+		public void onDownloadedOthers(JSONArray json) {
+			//creatureManager.addOther(point, randomGenerator.nextInt(4)+1);
+			//uiManager.sendLocationFailed(json.toString());
+			int numOthers = json.length(); 
+			creatureManager.clear();
+			for (int i = 0; i < numOthers; i++){
+				try {
+					JSONObject o = json.getJSONObject(i);
+					creatureManager.addOther(new LatLng(o.getDouble("latitude"), o.getDouble("longitude")), o.getInt("avatar"));
+					//uiManager.sendLocationFailed(json.toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					uiManager.sendLocationFailed(e.toString());
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void onDownloadFailure(String message) {
+			uiManager.sendLocationFailed(message);
 		}
    	    
 }

@@ -1,4 +1,4 @@
-package com.groupA.location.world;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -16,7 +16,7 @@ import android.util.Log;
 import android.widget.TextView;
 public class LoginActivity extends AsyncTask<String,Void,String>{
 public interface LoginListener {
-void loginSucceeded(String userID);
+void loginSucceeded(int charSelected, String userID);
 void loginFailed(String userID, String message);
 }
 LoginListener mListener;
@@ -31,6 +31,7 @@ protected String doInBackground(String... params) {
 try{
 String username = (String)params[0];
 String pass = (String)params[1];
+int charSelected = Integer.parseInt(params[2]);
 String link="http://54.77.125.52/app/WebserverProto.php";
 String data = URLEncoder.encode("username", "UTF-8")
 + "=" + URLEncoder.encode(username, "UTF-8");
@@ -56,7 +57,7 @@ break;
 if (sb.toString().equals(username)){
 Log.d("debug", sb.toString());
 Log.d("debug", username);
-mListener.loginSucceeded(sb.toString());
+mListener.loginSucceeded(charSelected, sb.toString());
 }
 else
 mListener.loginFailed(username, sb.toString());

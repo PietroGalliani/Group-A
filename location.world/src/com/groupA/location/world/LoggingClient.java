@@ -1,5 +1,8 @@
 package com.groupA.location.world;
 import com.groupA.location.world.LoginActivity.LoginListener;
+import com.groupA.location.world.LogoutActivity.LogoutListener;
+import com.groupA.location.world.UpdateLocationActivity.LocListener;
+
 import android.content.Context;
 import android.location.Location;
 import android.os.Parcel;
@@ -19,10 +22,13 @@ import android.widget.Toast;
 * be forgotten when you rotate your device or pause-unpause your app!
 *
 */
-public class LoggingClient implements Parcelable, LoginListener{
+public class LoggingClient implements Parcelable, LoginListener, LogoutListener, LocListener {
 public interface ClientListener {
-void loginSucceeded(int charSelected, String userID);
+void loginSucceeded(String userID);
 void loginFailed(String userID, String message);
+void logoutSucceeded(); 
+void logoutFailed(String message);
+void sendLocationFailed(String message);
 }
 ClientListener mListener;
 /* Just some constants for returning errors and the like.
@@ -62,18 +68,19 @@ out.writeInt(logged?1:0);
 *
 * @return the outcome of the login attempt
 * **/
-public void logIn(int charSelected, String name, String password){
-new LoginActivity((LoginListener)this).execute(name,password, Integer.toString(charSelected));
+public void logIn(String name, String password){
+new LoginActivity((LoginListener)this).execute(name,password);
 }
 /**
 * Logs out.
 * @retu
 * rn the outcome of the logout attempt
 */
-public int logOut(){
-logged = false;
+public void logOut(){
+	new LogoutActivity((LogoutListener)this).execute(mUserID);
+/*logged = false;
 mUserID = "";
-return LOGOUT_OK;
+return LOGOUT_OK;*/
 }
 /**
 *
@@ -100,9 +107,9 @@ return mUserID;
 */
 public int logCoords(Context mContext, Location mLocation){
 if (logged) {
-new UpdateLocationActivity().execute(mLocation.getLongitude(),mLocation.getLatitude());
-Toast.makeText(mContext, mUserID + " has logged position (" + mLocation.getLatitude() + ", " + mLocation.getLongitude() + ")", Toast.LENGTH_SHORT).show();
-return SENTDATA_OK;
+	new UpdateLocationActivity((LocListener)this, mUserID).execute(mLocation.getLongitude(), mLocation.getLatitude());
+    Toast.makeText(mContext, mUserID + " has logged position (" + mLocation.getLatitude() + ", " + mLocation.getLongitude() + ")", Toast.LENGTH_SHORT).show();
+    return SENTDATA_OK;
 }
 else {
 Toast.makeText(mContext, "Log in first!", Toast.LENGTH_SHORT).show();
@@ -125,10 +132,10 @@ return new LoggingClient[size];
 }
 };
 @Override
-public void loginSucceeded(int charSelected, String userID) {
+public void loginSucceeded(String userID) {
 Log.d("debug", userID);
 Log.d("debug",mListener.toString());
-mListener.loginSucceeded(charSelected, userID);
+mListener.loginSucceeded(userID);
 this.logged = true;
 this.mUserID = userID;
 }
@@ -136,5 +143,19 @@ this.mUserID = userID;
 public void loginFailed(String userID, String message) {
 mListener.loginFailed(userID, message);
 this.logged = false;
+}
+@Override
+public void logoutSucceeded() {
+	this.logged = false; 
+	this.mUserID = "";
+	mListener.logoutSucceeded();	
+}
+@Override
+public void logoutFailed(String message) {
+	mListener.logoutFailed(message);	
+}
+@Override
+public void sendLocationFailed(String message) {
+	mListener.sendLocationFailed(message);
 }
 }

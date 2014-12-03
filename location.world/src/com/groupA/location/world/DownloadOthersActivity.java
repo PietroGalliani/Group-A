@@ -10,17 +10,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
-public class LoginActivity extends AsyncTask<String,Void,String>{
-public interface LoginListener {
-void loginSucceeded(String userID);
-void loginFailed(String userID, String message);
+public class DownloadOthersActivity extends AsyncTask<String,Void,String>{
+public interface DownloadOthersListener {
+void downloadedOthers(JSONArray json);
+void downloadFailure(String message);
 }
-LoginListener mListener;
-public LoginActivity(LoginListener listener) {
+DownloadOthersListener mListener;
+public DownloadOthersActivity(DownloadOthersListener listener) {
 mListener = listener;
 }
 protected void onPreExecute(){
@@ -30,12 +33,12 @@ protected String doInBackground(String... params) {
 // TODO Auto-generated method stub
 try{
 String username = (String)params[0];
-String pass = (String)params[1];
-String link="http://54.77.125.52/app/WebserverProto.php";
+//String pass = (String)params[1];
+String link="http://54.77.125.52/app/activityManager.php";
 String data = URLEncoder.encode("username", "UTF-8")
-+ "=" + URLEncoder.encode(username, "UTF-8");
-data += "&" + URLEncoder.encode("password", "UTF-8")
-+ "=" + URLEncoder.encode(pass, "UTF-8");
++ "=" + URLEncoder.encode("admin", "UTF-8");
+//data += "&" + URLEncoder.encode("password", "UTF-8")
+//+ "=" + URLEncoder.encode(pass, "UTF-8");
 URL url = new URL(link);
 URLConnection conn = url.openConnection();
 conn.setDoOutput(true);
@@ -53,17 +56,12 @@ while((line = reader.readLine()) != null)
 sb.append(line);
 break;
 }
-if (sb.toString().equals(username)){
-Log.d("debug", sb.toString());
-Log.d("debug", username);
-mListener.loginSucceeded(sb.toString());
-}
-else
-mListener.loginFailed(username, sb.toString());
-Log.d("debug", sb.toString());
+JSONArray json=new JSONArray(sb.toString());
+mListener.downloadedOthers(json);
 return sb.toString();
 }catch(Exception e){
 Log.e("exception","login", e);
+mListener.downloadFailure(e.toString());
 return e.getMessage();}
 }
 @Override

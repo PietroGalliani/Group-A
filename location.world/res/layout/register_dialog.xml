@@ -25,6 +25,18 @@
         android:fontFamily="sans-serif"
         android:hint="@string/password_hint"
         android:inputType="textPassword" />
+    
+     <EditText
+        android:id="@+id/password_field2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:hint="@string/password_hint2"
+        android:inputType="textPassword" />
 
      <RadioGroup
          android:id="@+id/radioGroup1"

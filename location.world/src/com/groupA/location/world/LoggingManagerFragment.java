@@ -1,4 +1,8 @@
 package com.groupA.location.world;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.groupA.location.world.DownloadOthersActivity.DownloadOthersListener;
 import com.groupA.location.world.LoggingClient.ClientListener;
 import com.groupA.location.world.LoginActivity.LoginListener;
 import com.groupA.location.world.RegisterActivity.RegisterListener;
@@ -15,7 +19,7 @@ import android.util.Log;
 * low-level login, logout and message-passing functionalities.
 *
 */
-public class LoggingManagerFragment extends Fragment implements ClientListener, RegisterListener {
+public class LoggingManagerFragment extends Fragment implements ClientListener, RegisterListener, DownloadOthersListener {
 /**
 * The activity that deals with the manager -- that is, MainActivity -- must
 * implement the following functions:
@@ -25,10 +29,15 @@ public interface LoggingManagerListener {
 * The logging manager wants a new position to send to the server
 */
 public void onRequestPosition();
-void onLoginSucceeded(int charSelected, String userID);
+void onLoginSucceeded(String userID);
 void onLoginFailed(String userID, String message);
-void onRegOK(int charSelected, String userID);
+void onRegOK(String userID);
 void onRegFailed(String userID, String message);
+void onLogoutSucceded();
+void onLogoutFailed(String message);
+void onSendLocationFailed(String message);
+void onDownloadedOthers(JSONArray json);
+public void onDownloadFailure(String message);
 }
 /**
 * An instance of the interface, to call onRequestPosition() when necessary.
@@ -88,20 +97,20 @@ outState.putParcelable("loggingClient", mLoggingClient);
 * @param password
 * @return login_attempt_result
 */
-public void logIn(int charSelected, String name, String password){
-mLoggingClient.logIn(charSelected, name, password);
+public void logIn(String name, String password){
+mLoggingClient.logIn(name, password);
 }
 /**
 * Log out and stop logging your position
 * @return logout_attempt_result
 *
 */
-public int logOut(){
-int result = mLoggingClient.logOut();
-if (result == LoggingClient.LOGOUT_OK) {
+public void logOut(){
+mLoggingClient.logOut();
+/*if (result == LoggingClient.LOGOUT_OK) {
 stopLoggingPos();
 }
-return result;
+return result;*/
 }
 /**
 * Take a location to log, send it to the logging client
@@ -201,17 +210,17 @@ throw new ClassCastException(activity.toString()
 }
 }
 @Override
-public void loginSucceeded(int charSelected, String userID) {
+public void loginSucceeded(String userID) {
 Log.d("debug","logmanager");
-mListener.onLoginSucceeded(charSelected, userID);
+mListener.onLoginSucceeded(userID);
 }
 @Override
 public void loginFailed (String userID, String message) {
 mListener.onLoginFailed(userID, message);
 }
 
-public void register(int charSelected, String userID, String password) {
-	new RegisterActivity((RegisterListener)this).execute(userID,password, password, "test@test.it", "test@test.it");
+public void register(String userID, String password, int charSelected) {
+	new RegisterActivity((RegisterListener)this, charSelected).execute(userID,password);
 	//if (password.length() < 8)
 	//  mListener.onRegFailed(userID, "The password must be at least eight characters long)"); 
   //else
@@ -219,10 +228,36 @@ public void register(int charSelected, String userID, String password) {
 }
 @Override
 public void RegistrationSucceeded(String userID) {
-	mListener.onRegOK(1, userID);
+	mListener.onRegOK(userID);
 }
 @Override
 public void RegistrationFailed(String userID, String message) {
 	mListener.onRegFailed(userID, message);
 }
+@Override
+public void logoutSucceeded() {
+	stopLoggingPos();
+	mListener.onLogoutSucceded();
+}
+@Override
+public void logoutFailed(String message) {
+	mListener.onLogoutFailed(message);
+}
+@Override
+public void sendLocationFailed(String message) {
+	mListener.onSendLocationFailed(message);
+}
+
+public void downloadOthers(){
+	new DownloadOthersActivity((DownloadOthersListener)this).execute(mLoggingClient.getUserID()); 
+}
+@Override
+public void downloadedOthers(JSONArray json) {
+	mListener.onDownloadedOthers(json);
+}
+@Override
+public void downloadFailure(String message) {
+    mListener.onDownloadFailure(message);	
+}
+
 }

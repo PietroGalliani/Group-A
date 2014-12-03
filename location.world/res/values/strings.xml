@@ -8,7 +8,9 @@
     <string name="logout_text">Logout</string>
     <string name="logpos_text">Send Data</string>
     <string name="username_hint">username</string>
+    <string name="username_hint2">username (repeat)</string>
     <string name="password_hint">password</string>
+    <string name="password_hint2">password (repeat)</string>
     <string name="login_button_text">Login/Register</string>
 
 </resources>

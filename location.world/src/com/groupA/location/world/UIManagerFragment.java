@@ -40,7 +40,7 @@ public class UIManagerFragment extends Fragment
 		 * @param userID The id entered by the user
 		 * @param password The password entered by the user (do _not_ store!)
 		 */
-		public void onLogInCommand(int CharSelected, String userID, String password);
+		public void onLogInCommand(String userID, String password);
 		
 		/**
 		 * This is invoked if the user is attempting to log out.
@@ -60,7 +60,7 @@ public class UIManagerFragment extends Fragment
 
 		public void onCastButtonPressed();
 		
-		public void onRegisterRequest(int charSelected, String userID, String password);
+		public void onRegisterRequest(String userID, String password, int charSelected);
 
 	}
 	
@@ -220,10 +220,10 @@ public class UIManagerFragment extends Fragment
      * and chose to log in. In that case, we just pass this information back to the activity. 
      */
     @Override
-    public void onLoginDialogLogin(int charSelected, String userID, String password) {
+    public void onLoginDialogLogin(String userID, String password) {
     	status_UI = LOGGING; 
     	update_UI();
-    	mListener.onLogInCommand(charSelected, userID, password);
+    	mListener.onLogInCommand(userID, password);
     }
     
     /**
@@ -347,21 +347,22 @@ public class UIManagerFragment extends Fragment
 	 * The logout attempt was successful, update the user interface as required. 
 	 */
 	public void logoutSucceeded(){
+		Log.d("debug", "logout: updating user interface ");
 		status_UI = NOT_LOGGED;
-		userID_UI = "";		
+		//userID_UI = "";		
 		update_UI();
 	}
 	
 	/**
 	 * The logout attempt was not successful, display an error message. 
 	 */
-	public void logoutFailed() {
-    	LoginDialogFragment loginDialog = new LoginDialogFragment();
-		loginDialog.show(getFragmentManager(), "OpenLoginDialogFragment");
+	public void logoutFailed(String message) {
 		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
-		errorDialog.mMessage="Could not log out. Are you sure you are logged in?"; 
+		errorDialog.mMessage=message; 
 		errorDialog.mTitle="Logout Failed";
-		errorDialog.show(getFragmentManager(), "LogoutFailDialogFragment");	  
+		errorDialog.show(getFragmentManager(), "LogoutFailDialogFragment");	
+		status_UI = NOT_LOGGED;
+		update_UI();
 	}
 	
 	/**
@@ -416,9 +417,8 @@ public class UIManagerFragment extends Fragment
 	}
 
 	@Override
-	public void onRegisterRequest(int charSelected, String userID,
-			String password) {
-		mListener.onRegisterRequest(charSelected, userID, password);
+	public void onRegisterRequest(String userID, String password, int charSelected) {
+		mListener.onRegisterRequest(userID, password, charSelected);
 	}
 
 	public void registration_failed(String userID, String message) {
@@ -432,9 +432,35 @@ public class UIManagerFragment extends Fragment
     	errorDialog.show(getFragmentManager(), "RegErrorDialogFragment");
 	}
 
-	public void registration_succeeded() {
+	public void registration_succeeded(String userID) {
+		LoginDialogFragment loginDialog = new LoginDialogFragment();
+    	loginDialog.mID = userID; 
+    	loginDialog.show(getFragmentManager(), "OpenLoginDialogFragment");
+		
 		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
-    	errorDialog.mMessage="You are now registered. Press OK to login"; 
+    	errorDialog.mMessage="You can now login."; 
     	errorDialog.mTitle="Registration Succeeded";
+    	errorDialog.show(getFragmentManager(), "RegSuccededDialogFragment");
+	}
+
+	public void sendLocationFailed(String message) {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage=message; 
+    	errorDialog.mTitle="Could not send location";
+    	errorDialog.show(getFragmentManager(), "RegSendLocationErrorDialogFragment");
+	}
+
+	@Override
+	public void onRegisterDialogError(String userID, String message) {
+		
+		RegisterDialogFragment regDialog = new RegisterDialogFragment();
+    	regDialog.mID = userID; 
+    	regDialog.show(getFragmentManager(), "OpenRegDialogFragment");	
+		
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage=message; 
+    	errorDialog.mTitle="Registration Failed";
+    	errorDialog.show(getFragmentManager(), "RegErrorDialogFragment");
+		
 	}
 } 

@@ -17,9 +17,11 @@ public class RegisterActivity extends AsyncTask<String, Void, String> {
 		void RegistrationFailed(String userID, String message);
 	}
 	RegisterListener mListener;
+	int mAvatar;
 	
-	public RegisterActivity(RegisterListener listener) {
+	public RegisterActivity(RegisterListener listener, int avatar) {
 		mListener = listener;
+		mAvatar = avatar;
 	}
 	
 	@Override
@@ -27,20 +29,13 @@ protected String doInBackground(String... params) {
 try{
 String username = (String)params[0];
 String pass = (String)params[1];
-String confirmPass = (String)params[2];
-String email = (String)params[3];
-String confirmEmail = (String)params[4];
-String link="http://54.77.125.52/app/doRegister.php";
+String link="http://54.77.125.52/app/doRegisterAndr.php";
 String data = URLEncoder.encode("Name", "UTF-8")
 + "=" + URLEncoder.encode(username, "UTF-8");
-data += "&" + URLEncoder.encode("Email", "UTF-8")
-+ "=" + URLEncoder.encode(email, "UTF-8");
-data += "&" + URLEncoder.encode("confirm_email", "UTF-8")
-+ "=" + URLEncoder.encode(confirmEmail, "UTF-8");
 data += "&" + URLEncoder.encode("password", "UTF-8")
 + "=" + URLEncoder.encode(pass, "UTF-8");
-data += "&" + URLEncoder.encode("confirm_password'", "UTF-8")
-+ "=" + URLEncoder.encode(confirmPass, "UTF-8");
+data += "&" + URLEncoder.encode("avatar", "UTF-8")
++ "=" + mAvatar;
 URL url = new URL(link);
 URLConnection conn = url.openConnection();
 conn.setDoOutput(true);
@@ -58,9 +53,14 @@ while((line = reader.readLine()) != null)
 sb.append(line);
 break;
 }
-mListener.RegistrationFailed(username, sb.toString());
+if (sb.toString().equals("OK"))
+	mListener.RegistrationSucceeded(username);
+else
+	mListener.RegistrationFailed(username, sb.toString());
 return sb.toString();
 }catch(Exception e){
+	mListener.RegistrationFailed("", e.toString());
+
 Log.e("exception","login", e);
 return e.getMessage();}
 }
