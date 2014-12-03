@@ -39,7 +39,7 @@ public class LogoutActivity extends AsyncTask<String, Void, String> {
 			String username = (String) params[0];
 			String pass = (String) params[1];
 			int charSelected = Integer.parseInt(params[2]);
-			String link = "http://54.77.125.52/app/WebserverProto.php";
+			String link = "http://54.77.125.52/app/logout.php";
 			String data = URLEncoder.encode("username", "UTF-8") + "="
 					+ URLEncoder.encode(username, "UTF-8");
 			URL url = new URL(link);
