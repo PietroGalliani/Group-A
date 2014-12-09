@@ -92,6 +92,10 @@ public class CreaturesManager implements Parcelable {
 		mListOthers.clear();
 		mCharacter.clear();
 	}
+	
+	public void clearOthers() {
+		mListOthers.clear();
+	}
 
 	public List<Target> getTargets() {
 		// TODO Auto-generated method stub

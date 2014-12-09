@@ -88,9 +88,8 @@ public class MapManagerFragment extends Fragment {
 			            if (mMap != null) {
 			                mMap.setMyLocationEnabled(false);			  
 			                mMap.getUiSettings().setAllGesturesEnabled(false);
-			                mMap.getUiSettings().setZoomControlsEnabled(false);
-			                mMap.getUiSettings().setCompassEnabled(true);			                
-
+			                mMap.getUiSettings().setZoomControlsEnabled(true);
+			                mMap.getUiSettings().setCompassEnabled(true);	
 			            }
 			        //check if now map is available, otherwise send error back
 			        if (!map_available())
@@ -183,12 +182,17 @@ public class MapManagerFragment extends Fragment {
 		public void goToPosition(Location location) {
 			if (map_available() && location != null) {
 				LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-				CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel);
+				CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom);
 				mMap.animateCamera(cameraUpdate);
 				//updateGraphics();
 			}
 			else 
 				mListener.onGoToPosNoMap();
+		}
+		
+		public void zoomToStandardLevel() {
+			if (map_available()) 
+				mMap.animateCamera( CameraUpdateFactory.zoomTo( 17.0f ) );    
 		}
 		
 		/**

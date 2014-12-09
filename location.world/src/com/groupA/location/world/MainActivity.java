@@ -378,7 +378,7 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			runOnUiThread(new Runnable(){
 				@Override
 				public void run() {
-					uiManager.registration_succeeded(userID);			
+					uiManager.registration_succeeded(userID);		
 					mapManager.updateGraphics();
 					uiManager.loginSucceeded(userID, group);
 				}});
@@ -394,6 +394,7 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		public void run() {
 		uiManager.loginSucceeded(userID, groupID);
 		loggingManager.downloadOthers();
+		mapManager.zoomToStandardLevel();
 		mapManager.updateGraphics();
 		mapManager.startAnimating();
 		}
@@ -457,7 +458,7 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 				@Override
 				public void run() {
 			int numOthers = json.length(); 
-			creatureManager.clear();
+			creatureManager.clearOthers();
 			for (int i = 0; i < numOthers; i++){
 				try {
 					JSONObject o = json.getJSONObject(i);
