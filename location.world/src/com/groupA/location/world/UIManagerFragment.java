@@ -1,8 +1,14 @@
 package com.groupA.location.world;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.groupA.location.world.ChangeGroupDialogFragment.ChangeGroupDialogListener;
 import com.groupA.location.world.LoginDialogFragment.LoginDialogListener;
 import com.groupA.location.world.LogoutDialogFragment.LogoutDialogListener;
+import com.groupA.location.world.MessageDialogFragment.MessageDialogListener;
 import com.groupA.location.world.RegisterDialogFragment.RegisterDialogListener;
 
 import android.app.Activity;
@@ -28,7 +34,7 @@ import android.widget.Toast;
  *
  */
 public class UIManagerFragment extends Fragment 
-	implements OnClickListener, LoginDialogListener, LogoutDialogListener, RegisterDialogListener{
+	implements OnClickListener, LoginDialogListener, LogoutDialogListener, RegisterDialogListener, MessageDialogListener, ChangeGroupDialogListener{
 	
 	/**
 	 * Public interface for the UI to communicate with the main activity.
@@ -58,10 +64,13 @@ public class UIManagerFragment extends Fragment
 
 		public void onAddOthers(LatLng point);
 
-		public void onCastButtonPressed();
+		//public void onCastButtonPressed();
 		
-		public void onRegisterRequest(String userID, String password, int charSelected);
+		public void onRegisterRequest(String userID, String groupID, String password, int charSelected);
+		
+		public void onChangeGroup(String newGroup);
 
+		public void onSendMessage(String message);
 	}
 	
 	/**
@@ -80,9 +89,12 @@ public class UIManagerFragment extends Fragment
 	public static final int NOT_LOGGED = 0;
 	public static final int LOGGING = 1; 
 	public static final int LOGGED_IN = 2; 
+	public static final int LOGGING_OUT = 3;
 	
 	public int status_UI = NOT_LOGGED;
 	//public boolean logged_in_UI = false; 
+	
+	public boolean messages_downloaded = false; 
 	
 	
 	/**
@@ -91,13 +103,14 @@ public class UIManagerFragment extends Fragment
 	 * If you change its value, call updateUI() afterwards to update the look of the interface. 
 	 */
 	public String userID_UI = "";
+	public String groupID_UI = "";
 	
 	/**
 	 * Handlers for the buttons. 
 	 */
-    private Button logOutButton, logPosButton, logInButton, castButton;
+    private Button logOutButton, logPosButton, logInButton, messageButton, changeGroupButton;
     private RadioGroup radioGroup;
-	private TextView loggingText;
+	private TextView loggingText, loggingOutText, groupIDText;
     
     /**
      * This function gets called when the fragment is set up by the function setUpUI() in 
@@ -128,6 +141,7 @@ public class UIManagerFragment extends Fragment
         if (savedInstanceState != null) {
       	  status_UI = savedInstanceState.getInt("status");
       	  userID_UI = savedInstanceState.getString("userIDUI");
+      	  groupID_UI = savedInstanceState.getString("groupIDUI");
           update_UI();
  //         Toast.makeText(uiView.getContext(), "Restoring: logged in = " + logged_in_UI + ", user ID = " + userID_UI, Toast.LENGTH_SHORT).show();
         }                
@@ -153,13 +167,17 @@ public class UIManagerFragment extends Fragment
         logInButton = (Button) uiView.findViewById(R.id.login_dialog_button);
         logInButton.setOnClickListener(this);
         
-        castButton = (Button) uiView.findViewById(R.id.castButton);
-        castButton.setOnClickListener(this);
+        messageButton = (Button) uiView.findViewById(R.id.messageButton);
+        messageButton.setOnClickListener(this);
+
+        changeGroupButton = (Button) uiView.findViewById(R.id.changeGroupButton);
+        changeGroupButton.setOnClickListener(this);
         
         radioGroup = (RadioGroup) uiView.findViewById(R.id.radioGroup);		
         
         loggingText = (TextView) uiView.findViewById(R.id.loggingOnMessage);
-        
+        loggingOutText = (TextView) uiView.findViewById(R.id.loggingOutMessage);
+        groupIDText = (TextView) uiView.findViewById(R.id.groupIDText);
 	}
 	
 	/**
@@ -173,14 +191,26 @@ public class UIManagerFragment extends Fragment
 	    	openLoginDialog();
 	    if (view == logPosButton) 
 	    	logPosButtonPressed();
-	    if (view == castButton)
-	    	castButtonPressed();
-	    	
+	    if (view == messageButton)
+	    	messageButtonPressed();
+	    if (view == changeGroupButton)
+	    	changeGroupButtonPressed();
 	}
 	
-	private void castButtonPressed() {
-		// TODO Auto-generated method stub
-		mListener.onCastButtonPressed();
+	private void changeGroupButtonPressed() {
+		
+		ChangeGroupDialogFragment messageDialog = new ChangeGroupDialogFragment();
+		messageDialog.show(getFragmentManager(), "ChangegroupDialogFragment");	
+		/*
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage="change group button pressed"; 
+    	errorDialog.mTitle="button pressed";
+    	errorDialog.show(getFragmentManager(), "changeGroupButtonPressedFragment");*/
+	}
+
+	private void messageButtonPressed() {
+		MessageDialogFragment messageDialog = new MessageDialogFragment();
+		messageDialog.show(getFragmentManager(), "OpenLoginDialogFragment");	
 	}
 
 	/**
@@ -193,6 +223,7 @@ public class UIManagerFragment extends Fragment
         super.onSaveInstanceState(outState);
         outState.putInt("status", status_UI);
         outState.putString("userIDUI", userID_UI);
+        outState.putString("groupIDUI", groupID_UI);
     }
 	
 	/**
@@ -231,9 +262,10 @@ public class UIManagerFragment extends Fragment
      * 
      * @param userID The ID of the user, to display. 
      */
-    public void loginSucceeded(String userID) {
+    public void loginSucceeded(String userID, String groupID) {
     	status_UI = LOGGED_IN;
     	userID_UI = userID; 
+    	groupID_UI = groupID;
     	update_UI();
     }
     
@@ -248,6 +280,12 @@ public class UIManagerFragment extends Fragment
             	logOutButton.setVisibility(View.INVISIBLE);
             	logPosButton.setVisibility(View.INVISIBLE);
             	radioGroup.setVisibility(View.INVISIBLE);	
+            	loggingText.setVisibility(View.INVISIBLE);
+            	loggingOutText.setVisibility(View.INVISIBLE);
+            	changeGroupButton.setVisibility(View.INVISIBLE); 
+            	messageButton.setVisibility(View.INVISIBLE);
+            	groupIDText.setVisibility(View.INVISIBLE);
+            	
         	break;
     		case LOGGED_IN: 
     			logInButton.setVisibility(View.INVISIBLE);
@@ -256,6 +294,11 @@ public class UIManagerFragment extends Fragment
             	logOutButton.setText("Log Out (" + userID_UI +")");	
             	radioGroup.setVisibility(View.VISIBLE);
             	loggingText.setVisibility(View.INVISIBLE);
+            	loggingOutText.setVisibility(View.INVISIBLE);
+            	changeGroupButton.setVisibility(View.VISIBLE); 
+            	messageButton.setVisibility(View.VISIBLE);
+            	groupIDText.setVisibility(View.VISIBLE);
+            	groupIDText.setText("Group: " + groupID_UI);
             break;
     		case LOGGING: 
     			logInButton.setVisibility(View.INVISIBLE);
@@ -263,7 +306,23 @@ public class UIManagerFragment extends Fragment
             	logPosButton.setVisibility(View.INVISIBLE);
             	radioGroup.setVisibility(View.INVISIBLE);
             	loggingText.setVisibility(View.VISIBLE);
+            	loggingOutText.setVisibility(View.INVISIBLE);
+            	changeGroupButton.setVisibility(View.INVISIBLE); 
+            	messageButton.setVisibility(View.INVISIBLE);
+            	groupIDText.setVisibility(View.INVISIBLE);
             break;
+    		case LOGGING_OUT: 
+    			logInButton.setVisibility(View.INVISIBLE);
+            	logOutButton.setVisibility(View.INVISIBLE);
+            	logPosButton.setVisibility(View.INVISIBLE);
+            	radioGroup.setVisibility(View.INVISIBLE);
+            	loggingText.setVisibility(View.INVISIBLE);
+            	loggingOutText.setVisibility(View.VISIBLE);
+            	changeGroupButton.setVisibility(View.INVISIBLE); 
+            	messageButton.setVisibility(View.INVISIBLE);
+            	groupIDText.setVisibility(View.INVISIBLE);
+            break;
+            
     		default: 
 				ErrorDialogFragment errorDialog = new ErrorDialogFragment();
 				errorDialog.mMessage= "UI status " + status_UI + " not recognized";
@@ -340,6 +399,8 @@ public class UIManagerFragment extends Fragment
      */
 	@Override
 	public void onLogoutChosen() {
+		status_UI = LOGGING_OUT; 
+		update_UI();
 		mListener.onLogOutCommand();
 	}
 	
@@ -397,9 +458,7 @@ public class UIManagerFragment extends Fragment
 			int r = radioGroup.getCheckedRadioButtonId();
 			switch(r){
 			case R.id.button_beacon : mListener.onAddBeacon(point); break;
-			case R.id.button_target : mListener.onAddTarget(point); break; 
-			case R.id.button_others : mListener.onAddOthers(point); break;
-			
+			case R.id.button_target : mListener.onAddTarget(point); break; 			
 			default: 
 				ErrorDialogFragment errorDialog = new ErrorDialogFragment();
 				errorDialog.mMessage= "Select first what you want to add";
@@ -417,8 +476,8 @@ public class UIManagerFragment extends Fragment
 	}
 
 	@Override
-	public void onRegisterRequest(String userID, String password, int charSelected) {
-		mListener.onRegisterRequest(userID, password, charSelected);
+	public void onRegisterRequest(String userID, String groupID, String password, int charSelected) {
+		mListener.onRegisterRequest(userID, groupID, password, charSelected);
 	}
 
 	public void registration_failed(String userID, String message) {
@@ -463,4 +522,68 @@ public class UIManagerFragment extends Fragment
     	errorDialog.show(getFragmentManager(), "RegErrorDialogFragment");
 		
 	}
-} 
+
+	@Override
+	public void onSendMessage(String message) {
+		mListener.onSendMessage(message);
+	}
+
+	@Override
+	public void onChangeGroupRequest(String newgroup) {
+		
+		groupID_UI = newgroup; 
+		update_UI();
+		mListener.onChangeGroup(newgroup);
+	}
+
+	public void changeGroupSucceded(String group) {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage="You are now in group ".concat(group); 
+    	errorDialog.mTitle="Change Group Succeeded";
+    	errorDialog.show(getFragmentManager(), "ChangeGroupErrorDialogFragment");		
+	}
+
+	public void changeGroupFailed(String message) {
+		ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+    	errorDialog.mMessage=message; 
+    	errorDialog.mTitle="Change Group Failed";
+    	errorDialog.show(getFragmentManager(), "ChangeGroupErrorDialogFragment");		
+	}
+
+	public void downloadedMessages(JSONArray json) {
+		
+		/*if (!messages_downloaded) {
+			messages_downloaded = true;*/ 
+			/*ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+			errorDialog.mTitle = "Messages Received"; 
+			errorDialog.mMessage = "AAA";
+	    	errorDialog.show(getFragmentManager(), "MessagesReceivedFragment");		*/
+			
+			int numMessages = json.length(); 
+			/*ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+			errorDialog.mTitle = numMessages + " messages Received"; 
+			errorDialog.mMessage = json.toString();
+	    	errorDialog.show(getFragmentManager(), "MessagesReceivedFragment");	*/
+	    	
+			for (int i = numMessages - 1; i >= 0; i--){
+				try {
+					JSONObject o = json.getJSONObject(i);
+					String sender = o.getString("userID"); 
+					String message = o.getString("content"); 
+					ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+					errorDialog.mTitle="Message from " + sender + " (" + (i+1) + " of " + numMessages + ")";
+					errorDialog.mMessage = message;
+		    	    errorDialog.show(getFragmentManager(), "NewMessagesReceivedFragment");
+					
+					//uiManager.sendLocationFailed(json.toString());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					ErrorDialogFragment errorDialog = new ErrorDialogFragment();
+					errorDialog.mTitle = "Message Download Error"; 
+					errorDialog.mMessage = e.toString();
+					e.printStackTrace();
+				}
+			}
+		}
+	
+}

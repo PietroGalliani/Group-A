@@ -127,7 +127,7 @@ public class MapManagerFragment extends Fragment {
                     //mMap.addMarker(new MarkerOptions().position(point));
                 	// if map is clicked, pass the information back to MainActivity
                 	mListener.onMapClick(point);
-                	updateGraphics();
+                	//updateGraphics();
                 }
             });
 		}
@@ -185,7 +185,7 @@ public class MapManagerFragment extends Fragment {
 				LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 				CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel);
 				mMap.animateCamera(cameraUpdate);
-				updateGraphics();
+				//updateGraphics();
 			}
 			else 
 				mListener.onGoToPosNoMap();

@@ -53,21 +53,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Beacon" />
-<RadioButton
-        android:id="@+id/button_others"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Other Players" />
+
     </RadioGroup>
 
     <Button
-        android:id="@+id/castButton"
+        android:id="@+id/messageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:text="Cast"
-        android:visibility = "visible" />
+        android:text="Send message"
+        android:visibility = "invisible" />
 
     <TextView
         android:id="@+id/loggingOnMessage"
@@ -80,4 +76,34 @@
         android:textAppearance="?android:attr/textAppearanceLarge" 
         android:visibility = "invisible"/>
     
+        <TextView
+        android:id="@+id/loggingOutMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/log_out_button"
+        android:layout_alignBottom="@+id/log_out_button"
+        android:layout_alignParentLeft="true"
+        android:text="Logging out..."
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+        android:visibility = "invisible"/>
+
+    <Button
+        android:id="@+id/changeGroupButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/messageButton"
+        android:layout_below="@+id/messageButton"
+        android:text="Change Group"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/groupIDText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="No Group"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="invisible" />
+
 </RelativeLayout>

@@ -358,41 +358,41 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		public void onTick() {
 			creatureManager.step();
 		}
-
+/*
 		@Override
 		public void onCastButtonPressed() {
 			LatLng point = creatureManager.castBeacons(); 
 			mapManager.showExplosion(point);
 			
 		}
-
+*/
 		@Override
-		public void onRegisterRequest(String userID,
+		public void onRegisterRequest(String userID, String groupID,
 				String password, int charSelected) {
-			loggingManager.register(userID, password, charSelected);
+			loggingManager.register(userID, groupID, password, charSelected);
 		}
 
 
 		@Override
-		public void onRegOK(final String userID) {
+		public void onRegOK(final String userID, final String group) {
 			runOnUiThread(new Runnable(){
 				@Override
 				public void run() {
 					uiManager.registration_succeeded(userID);			
 					mapManager.updateGraphics();
-					uiManager.loginSucceeded(userID);
+					uiManager.loginSucceeded(userID, group);
 				}});
 		}
 		
 		
 		
 		@Override
-		public void onLoginSucceeded(final String userID) {
+		public void onLoginSucceeded(final String userID, final String groupID) {
 		Log.d("debug", "main");
 		runOnUiThread(new Runnable(){
 		@Override
 		public void run() {
-		uiManager.loginSucceeded(userID);
+		uiManager.loginSucceeded(userID, groupID);
 		loggingManager.downloadOthers();
 		mapManager.updateGraphics();
 		mapManager.startAnimating();
@@ -450,9 +450,12 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		}
 
 		@Override
-		public void onDownloadedOthers(JSONArray json) {
+		public void onDownloadedOthers(final JSONArray json) {
 			//creatureManager.addOther(point, randomGenerator.nextInt(4)+1);
 			//uiManager.sendLocationFailed(json.toString());
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
 			int numOthers = json.length(); 
 			creatureManager.clear();
 			for (int i = 0; i < numOthers; i++){
@@ -466,11 +469,46 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 					e.printStackTrace();
 				}
 			}
+			mapManager.updateGraphics();
+	    	downloadPositions();
+		
+				}
+			});
 		}
 
 		@Override
 		public void onDownloadFailure(String message) {
 			uiManager.sendLocationFailed(message);
+		}
+
+		@Override
+		public void onChangeGroup(String newGroup) {
+			loggingManager.changeGroup(newGroup);
+		}
+
+		@Override
+		public void onChangeGroupSucceeded(String group) {
+			uiManager.changeGroupSucceded(group);
+		}
+
+		@Override
+		public void onChangeGroupFailed(String message) {
+			uiManager.changeGroupFailed(message);
+		}
+
+		@Override
+		public void onDownloadedMessages(final JSONArray json) {	
+			runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					uiManager.downloadedMessages(json);
+				}
+			});
+		}
+
+		@Override
+		public void onSendMessage(String message) {
+			loggingManager.sendMessage(message);
 		}
    	    
 }

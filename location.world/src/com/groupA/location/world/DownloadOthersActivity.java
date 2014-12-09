@@ -21,6 +21,7 @@ public class DownloadOthersActivity extends AsyncTask<String,Void,String>{
 public interface DownloadOthersListener {
 void downloadedOthers(JSONArray json);
 void downloadFailure(String message);
+void downloadedMessages(JSONArray json);
 }
 DownloadOthersListener mListener;
 public DownloadOthersActivity(DownloadOthersListener listener) {
@@ -36,7 +37,7 @@ String username = (String)params[0];
 //String pass = (String)params[1];
 String link="http://54.77.125.52/app/activityManager.php";
 String data = URLEncoder.encode("username", "UTF-8")
-+ "=" + URLEncoder.encode("admin", "UTF-8");
++ "=" + URLEncoder.encode(username, "UTF-8");
 //data += "&" + URLEncoder.encode("password", "UTF-8")
 //+ "=" + URLEncoder.encode(pass, "UTF-8");
 URL url = new URL(link);
@@ -56,8 +57,24 @@ while((line = reader.readLine()) != null)
 sb.append(line);
 break;
 }
+//mListener.downloadFailure(sb.toString());
+
 JSONArray json=new JSONArray(sb.toString());
-mListener.downloadedOthers(json);
+mListener.downloadedOthers(json.getJSONArray(0));
+mListener.downloadedMessages(json.getJSONArray(1));
+
+/*sb = new StringBuilder();
+line = null;
+// Read Server Response
+while((line = reader.readLine()) != null)
+{
+sb.append(line);
+break;
+}
+
+JSONArray messages = new JSONArray(sb.toString());
+mListener.downloadedMessages(messages);*/
+
 return sb.toString();
 }catch(Exception e){
 Log.e("exception","login", e);

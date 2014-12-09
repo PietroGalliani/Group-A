@@ -24,7 +24,7 @@ import android.widget.Toast;
 */
 public class LoggingClient implements Parcelable, LoginListener, LogoutListener, LocListener {
 public interface ClientListener {
-void loginSucceeded(String userID);
+void loginSucceeded(String userID, String groupID);
 void loginFailed(String userID, String message);
 void logoutSucceeded(); 
 void logoutFailed(String message);
@@ -132,12 +132,12 @@ return new LoggingClient[size];
 }
 };
 @Override
-public void loginSucceeded(String userID) {
+public void loginSucceeded(String userID, String groupID) {
 Log.d("debug", userID);
 Log.d("debug",mListener.toString());
-mListener.loginSucceeded(userID);
-this.logged = true;
 this.mUserID = userID;
+mListener.loginSucceeded(userID, groupID);
+this.logged = true;
 }
 @Override
 public void loginFailed(String userID, String message) {

@@ -13,7 +13,7 @@ import android.util.Log;
 public class RegisterActivity extends AsyncTask<String, Void, String> {
 
 	public interface RegisterListener {
-		void RegistrationSucceeded(String userID);
+		void RegistrationSucceeded(String userID, String group);
 		void RegistrationFailed(String userID, String message);
 	}
 	RegisterListener mListener;
@@ -28,7 +28,8 @@ public class RegisterActivity extends AsyncTask<String, Void, String> {
 protected String doInBackground(String... params) {
 try{
 String username = (String)params[0];
-String pass = (String)params[1];
+String group = (String)params[1];
+String pass = (String)params[2];
 String link="http://54.77.125.52/app/doRegisterAndr.php";
 String data = URLEncoder.encode("Name", "UTF-8")
 + "=" + URLEncoder.encode(username, "UTF-8");
@@ -36,6 +37,8 @@ data += "&" + URLEncoder.encode("password", "UTF-8")
 + "=" + URLEncoder.encode(pass, "UTF-8");
 data += "&" + URLEncoder.encode("avatar", "UTF-8")
 + "=" + mAvatar;
+data += "&" + URLEncoder.encode("group", "UTF-8")
++ "=" + URLEncoder.encode(group, "UTF-8");
 URL url = new URL(link);
 URLConnection conn = url.openConnection();
 conn.setDoOutput(true);
@@ -54,7 +57,7 @@ sb.append(line);
 break;
 }
 if (sb.toString().equals("OK"))
-	mListener.RegistrationSucceeded(username);
+	mListener.RegistrationSucceeded(username, group);
 else
 	mListener.RegistrationFailed(username, sb.toString());
 return sb.toString();

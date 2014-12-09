@@ -16,7 +16,7 @@ import android.util.Log;
 import android.widget.TextView;
 public class LoginActivity extends AsyncTask<String,Void,String>{
 public interface LoginListener {
-void loginSucceeded(String userID);
+void loginSucceeded(String userID, String groupID);
 void loginFailed(String userID, String message);
 }
 LoginListener mListener;
@@ -53,11 +53,17 @@ while((line = reader.readLine()) != null)
 sb.append(line);
 break;
 }
-if (sb.toString().equals(username)){
+String s = sb.toString();
+if (s.startsWith("OK")) {
+	Log.d("debug", sb.toString());
+	Log.d("debug", username);
+	mListener.loginSucceeded(username, s.substring(2, s.length()));
+}
+/*if (sb.toString().equals(username)){
 Log.d("debug", sb.toString());
 Log.d("debug", username);
 mListener.loginSucceeded(sb.toString());
-}
+}*/
 else
 mListener.loginFailed(username, sb.toString());
 Log.d("debug", sb.toString());

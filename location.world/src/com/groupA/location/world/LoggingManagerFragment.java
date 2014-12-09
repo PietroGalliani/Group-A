@@ -2,6 +2,7 @@ package com.groupA.location.world;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.groupA.location.world.ChangeGroupActivity.ChangeGroupListener;
 import com.groupA.location.world.DownloadOthersActivity.DownloadOthersListener;
 import com.groupA.location.world.LoggingClient.ClientListener;
 import com.groupA.location.world.LoginActivity.LoginListener;
@@ -19,7 +20,8 @@ import android.util.Log;
 * low-level login, logout and message-passing functionalities.
 *
 */
-public class LoggingManagerFragment extends Fragment implements ClientListener, RegisterListener, DownloadOthersListener {
+public class LoggingManagerFragment extends Fragment implements ClientListener, RegisterListener, DownloadOthersListener,
+ChangeGroupListener{
 /**
 * The activity that deals with the manager -- that is, MainActivity -- must
 * implement the following functions:
@@ -29,15 +31,19 @@ public interface LoggingManagerListener {
 * The logging manager wants a new position to send to the server
 */
 public void onRequestPosition();
-void onLoginSucceeded(String userID);
+void onLoginSucceeded(String userID, String groupID);
 void onLoginFailed(String userID, String message);
-void onRegOK(String userID);
+void onRegOK(String userID, String group);
 void onRegFailed(String userID, String message);
 void onLogoutSucceded();
 void onLogoutFailed(String message);
 void onSendLocationFailed(String message);
 void onDownloadedOthers(JSONArray json);
+void onDownloadedMessages(JSONArray json);
+
 public void onDownloadFailure(String message);
+public void onChangeGroupSucceeded(String group);
+public void onChangeGroupFailed(String message);
 }
 /**
 * An instance of the interface, to call onRequestPosition() when necessary.
@@ -106,6 +112,7 @@ mLoggingClient.logIn(name, password);
 *
 */
 public void logOut(){
+stopLoggingPos();
 mLoggingClient.logOut();
 /*if (result == LoggingClient.LOGOUT_OK) {
 stopLoggingPos();
@@ -210,25 +217,25 @@ throw new ClassCastException(activity.toString()
 }
 }
 @Override
-public void loginSucceeded(String userID) {
+public void loginSucceeded(String userID, String groupID) {
 Log.d("debug","logmanager");
-mListener.onLoginSucceeded(userID);
+mListener.onLoginSucceeded(userID, groupID);
 }
 @Override
 public void loginFailed (String userID, String message) {
 mListener.onLoginFailed(userID, message);
 }
 
-public void register(String userID, String password, int charSelected) {
-	new RegisterActivity((RegisterListener)this, charSelected).execute(userID,password);
+public void register(String userID, String groupID, String password, int charSelected) {
+	new RegisterActivity((RegisterListener)this, charSelected).execute(userID, groupID, password);
 	//if (password.length() < 8)
 	//  mListener.onRegFailed(userID, "The password must be at least eight characters long)"); 
   //else
   //mListener.onRegOK(charSelected, userID);
 }
 @Override
-public void RegistrationSucceeded(String userID) {
-	mListener.onRegOK(userID);
+public void RegistrationSucceeded(String userID, String group) {
+	mListener.onRegOK(userID, group);
 }
 @Override
 public void RegistrationFailed(String userID, String message) {
@@ -258,6 +265,24 @@ public void downloadedOthers(JSONArray json) {
 @Override
 public void downloadFailure(String message) {
     mListener.onDownloadFailure(message);	
+}
+public void changeGroup(String newGroup) {
+	new ChangeGroupActivity((ChangeGroupListener)this, mLoggingClient.getUserID(), newGroup).execute();
+}
+@Override
+public void changeGroupSucceeded(String group) {
+	mListener.onChangeGroupSucceeded(group);
+}
+@Override
+public void changeGroupFailed(String message) {
+	mListener.onChangeGroupFailed(message);
+}
+@Override
+public void downloadedMessages(JSONArray json) {
+	mListener.onDownloadedMessages(json);
+}
+public void sendMessage(String message) {
+	new SendMessageActivity(mLoggingClient.getUserID(), message).execute();
 }
 
 }

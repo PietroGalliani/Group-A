@@ -37,7 +37,7 @@ public class RegisterDialogFragment extends DialogFragment{
 		 * @param password the user's password
 		 */
 		public void onRegisterDialogError(String userID, String message); 
-		public void onRegisterRequest(String userID, String password, int charSelected);
+		public void onRegisterRequest(String userID,  String groupID, String password, int charSelected);
 	}
 	
 	/**
@@ -211,6 +211,8 @@ public class RegisterDialogFragment extends DialogFragment{
     	 * Find the user id, password fields
     	 */
         String userID = ((TextView) view.findViewById(R.id.username_field)).getText().toString();
+        String groupID = ((TextView) view.findViewById(R.id.group_field)).getText().toString();
+
         String userPasswd = ((TextView) view.findViewById(R.id.password_field)).getText().toString();
         String userPasswd2 = ((TextView) view.findViewById(R.id.password_field2)).getText().toString(); RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup1);
         
@@ -231,7 +233,7 @@ public class RegisterDialogFragment extends DialogFragment{
         if (!userPasswd.equals(userPasswd2))	
         	mListener.onRegisterDialogError(userID, "The passwords do not match");
         else
-        	mListener.onRegisterRequest(userID, userPasswd, charSelected);
+        	mListener.onRegisterRequest(userID, groupID, userPasswd, charSelected);
 		/**
 		 * Hide the keyboard
 		 */
