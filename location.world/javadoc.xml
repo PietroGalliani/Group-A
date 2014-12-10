@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" additionalparam="-bootclasspath /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar -encoding utf-8" author="false" classpath="../android-support-v7-appcompat/bin/android-support-v7-appcompat.jar:../android-support-v7-appcompat/libs/android-support-v4.jar:../google-play-services_lib/libs/google-play-services.jar:../google-play-services_lib/bin/google-play-services_lib.jar:../android-support-v7-appcompat/libs/android-support-v7-appcompat.jar" destdir="doc" nodeprecated="true" nodeprecatedlist="true" noindex="false" nonavbar="false" notree="false" source="1.7" sourcefiles="src/com/groupA/location/world/ChangeGroupDialogFragment.java" sourcepath="gen:src" splitindex="true" use="true" version="false">
+            <link href="http://developer.android.com/reference/"/>
+        </javadoc>
+    </target>
+</project>

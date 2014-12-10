@@ -60,7 +60,7 @@ private LoggingClient mLoggingClient;
 /**
 * Time span between log updates, in milliseconds
 */
-private int mLoggingInterval = 10000;
+private int mLoggingInterval = 5000;
 /**
 * True if we are logging our position periodically, false otherwise
 */
@@ -219,6 +219,7 @@ throw new ClassCastException(activity.toString()
 @Override
 public void loginSucceeded(String userID, String groupID) {
 Log.d("debug","logmanager");
+startLoggingIfPossible();
 mListener.onLoginSucceeded(userID, groupID);
 }
 @Override

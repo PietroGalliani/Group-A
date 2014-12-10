@@ -6,6 +6,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
@@ -21,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 /**
  * 
@@ -28,7 +30,7 @@ import android.view.ViewGroup;
  * Associated with the layout file map_manager.xml.
  * 
  */
-public class MapManagerFragment extends Fragment {
+public class MapManagerFragment extends Fragment implements OnMarkerClickListener {
 	
 	/**
 	 * The activity that deals with the manager -- that is, MainActivity -- must 
@@ -42,7 +44,7 @@ public class MapManagerFragment extends Fragment {
 		public void onGoToPosNoMap();
 		public void onMapClick(LatLng point);
 		public List<Beacon> requestBeacons();
-		public PlayerCharacter requestCharacter();
+		//public PlayerCharacter requestCharacter();
 		public List<Target> requestTargets();
 		public List<PlayerCharacter> requestOthers();
 		public void onTick();
@@ -90,6 +92,8 @@ public class MapManagerFragment extends Fragment {
 			                mMap.getUiSettings().setAllGesturesEnabled(false);
 			                mMap.getUiSettings().setZoomControlsEnabled(true);
 			                mMap.getUiSettings().setCompassEnabled(true);	
+			                
+			                mMap.setOnMarkerClickListener(this);
 			            }
 			        //check if now map is available, otherwise send error back
 			        if (!map_available())
@@ -224,7 +228,7 @@ public class MapManagerFragment extends Fragment {
 			
 			drawTargets();
 			
-			drawPC();
+			//drawPC();
 			
 			drawOthers();
 		}
@@ -243,14 +247,14 @@ public class MapManagerFragment extends Fragment {
 			}
 		}
 		
-		public void drawPC(){
+		/*public void drawPC(){
 			PlayerCharacter pCharacter = mListener.requestCharacter(); 
 			if (pCharacter.isVisible()) {
 				loadCharacterIcon(pCharacter);
 				playerIcon.setPosition(pCharacter.getPosition());
 				playerIcon.setVisible(true);
 			}
-		}
+		}*/
 		
 		public void drawOthers(){
 			List<PlayerCharacter> others = mListener.requestOthers(); 
@@ -262,7 +266,7 @@ public class MapManagerFragment extends Fragment {
 		public void drawCharacter(PlayerCharacter p){
 			MarkerOptions userCharacterOptions = new MarkerOptions()			               
             .position(p.getPosition())
-            .icon(mSpriteManager.getCharIcon(p.ch_type));
+            .icon(mSpriteManager.getCharIcon(p.ch_type)).title(p.user_name);
             mMap.addMarker(userCharacterOptions);
 		}
 		
@@ -309,6 +313,12 @@ public class MapManagerFragment extends Fragment {
 	       */
 	      void stopAnimating() {
 	    	   mHandler.removeCallbacks(mSpriteAnimator);
+	      }
+	      
+	      @Override
+	      public boolean onMarkerClick(final Marker marker) {
+	    	 Toast.makeText(getActivity(), "You clicked on user " + marker.getTitle(), Toast.LENGTH_SHORT).show();
+	    	  return true; 
 	      }
 
 		public void showExplosion(LatLng point) {

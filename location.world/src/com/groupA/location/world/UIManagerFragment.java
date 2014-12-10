@@ -62,8 +62,6 @@ public class UIManagerFragment extends Fragment
 
 		public void onAddTarget(LatLng point);
 
-		public void onAddOthers(LatLng point);
-
 		//public void onCastButtonPressed();
 		
 		public void onRegisterRequest(String userID, String groupID, String password, int charSelected);

@@ -125,6 +125,7 @@ implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 		//getLocation();
 		
 		mListener.onLocationAvailable();
+		
 	}
 	/*
 	 * If you are now connected, tell the main activity so

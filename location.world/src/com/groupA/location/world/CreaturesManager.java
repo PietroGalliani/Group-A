@@ -14,13 +14,13 @@ public class CreaturesManager implements Parcelable {
 	List<Target> mListTargets;
 	List<PlayerCharacter> mListOthers;
 	
-	PlayerCharacter mCharacter;
+	//PlayerCharacter mCharacter;
 		
 	public CreaturesManager(){
 		mListBeacons = new ArrayList<Beacon>();
 		mListTargets = new ArrayList<Target>();
 		mListOthers = new ArrayList<PlayerCharacter>();
-		mCharacter = new PlayerCharacter();
+		//mCharacter = new PlayerCharacter();
 	}
 	
 	public void addBeacon(LatLng position){
@@ -31,24 +31,25 @@ public class CreaturesManager implements Parcelable {
 		mListTargets.add(new Target(position));
 	}
 	
-	public void addOther(LatLng position, int type){
+	public void addOther(LatLng position, int type, String username){
 		PlayerCharacter ch = new PlayerCharacter(); 
 		ch.moveTo(position);
 		ch.pickIcon(type);
+		ch.user_name = username; 
 		mListOthers.add(ch);
 	}
 	
-	public void setCharacter(LatLng position){
+/*	public void setCharacter(LatLng position){
 		mCharacter.moveTo(position);
-	}
+	}*/
 	
 	public List<Beacon> getBeacons(){
 		return mListBeacons;
 	}
 	
-	public PlayerCharacter getCharacter(){
+	/*public PlayerCharacter getCharacter(){
 		return mCharacter;
-	}
+	}*/
 
 	@Override
 	public int describeContents() {
@@ -61,7 +62,7 @@ public class CreaturesManager implements Parcelable {
 		in.readTypedList(mListBeacons, Beacon.CREATOR);
 		in.readTypedList(mListTargets, Target.CREATOR);
 		in.readTypedList(mListOthers, PlayerCharacter.CREATOR);
-		mCharacter = in.readParcelable(null);		
+		//mCharacter = in.readParcelable(null);		
 	}
 	
 	/** Save the data before pausing/rotating **/
@@ -69,7 +70,7 @@ public class CreaturesManager implements Parcelable {
         out.writeTypedList(mListBeacons);
         out.writeTypedList(mListTargets);
         out.writeTypedList(mListOthers);
-        out.writeParcelable(mCharacter, 0);
+       // out.writeParcelable(mCharacter, 0);
     }
     
     public static final Parcelable.Creator<CreaturesManager> CREATOR
@@ -82,15 +83,15 @@ public class CreaturesManager implements Parcelable {
 	}
     };
 
-	public void pickCharacter(int charSelected) {
+	/*public void pickCharacter(int charSelected) {
 		mCharacter.pickIcon(charSelected);
-	}
+	}*/
 
 	public void clear() {
 		mListBeacons.clear();
 		mListTargets.clear();
 		mListOthers.clear();
-		mCharacter.clear();
+		//mCharacter.clear();
 	}
 	
 	public void clearOthers() {

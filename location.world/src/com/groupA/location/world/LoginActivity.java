@@ -31,7 +31,7 @@ protected String doInBackground(String... params) {
 try{
 String username = (String)params[0];
 String pass = (String)params[1];
-String link="http://54.77.125.52/app/WebserverProto.php";
+String link="http://54.77.125.52/app/login.php";
 String data = URLEncoder.encode("username", "UTF-8")
 + "=" + URLEncoder.encode(username, "UTF-8");
 data += "&" + URLEncoder.encode("password", "UTF-8")

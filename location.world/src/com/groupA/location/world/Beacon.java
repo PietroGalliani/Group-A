@@ -5,6 +5,10 @@ import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
+/**
+ * 
+ *
+ */
 public class Beacon implements Parcelable {
 	private LatLng position;
 

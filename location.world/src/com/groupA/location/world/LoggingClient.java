@@ -108,7 +108,7 @@ return mUserID;
 public int logCoords(Context mContext, Location mLocation){
 if (logged) {
 	new UpdateLocationActivity((LocListener)this, mUserID).execute(mLocation.getLongitude(), mLocation.getLatitude());
-    Toast.makeText(mContext, mUserID + " has logged position (" + mLocation.getLatitude() + ", " + mLocation.getLongitude() + ")", Toast.LENGTH_SHORT).show();
+    //Toast.makeText(mContext, mUserID + " has logged position (" + mLocation.getLatitude() + ", " + mLocation.getLongitude() + ")", Toast.LENGTH_SHORT).show();
     return SENTDATA_OK;
 }
 else {
@@ -136,8 +136,8 @@ public void loginSucceeded(String userID, String groupID) {
 Log.d("debug", userID);
 Log.d("debug",mListener.toString());
 this.mUserID = userID;
-mListener.loginSucceeded(userID, groupID);
 this.logged = true;
+mListener.loginSucceeded(userID, groupID);
 }
 @Override
 public void loginFailed(String userID, String message) {

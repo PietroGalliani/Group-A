@@ -44,7 +44,7 @@ public class ChangeGroupDialogFragment extends DialogFragment{
 	 */
 	ChangeGroupDialogListener mListener; 
 	
-	/**
+	/**<qa
 	 * The login dialog's title
 	 */
 	public String mTitle = "Change group";

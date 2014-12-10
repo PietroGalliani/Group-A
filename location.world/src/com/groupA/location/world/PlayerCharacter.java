@@ -12,6 +12,7 @@ public class PlayerCharacter implements Parcelable {
 	private Boolean positioned = false;
 	private Boolean iconChosen = false; 
 	public int ch_type;
+	public String user_name;
 	
 	
 	public PlayerCharacter(){

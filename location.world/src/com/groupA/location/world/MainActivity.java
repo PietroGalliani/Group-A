@@ -67,6 +67,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	 	/* 1. Initializing functions */
 	 
 	 	
+	    /* (non-Javadoc)
+	     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
+	     */
 	    @Override
 	    protected void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
@@ -130,6 +133,12 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    		 locationManager = (LocationManagerFragment) locmanager;
 	    }
 	    
+	    /**
+	     * Sets up the creature manager, to represent the positions and properties of other players, beacons, 
+	     * and targets
+	     * 
+	     * @param savedInstanceState
+	     */
 	    public void setUpCManager(Bundle savedInstanceState){
 	    	if (savedInstanceState == null) {
 	    		creatureManager = new CreaturesManager();
@@ -146,6 +155,8 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	        super.onSaveInstanceState(outState);
 	        outState.putParcelable("cManager", creatureManager);
 	    }
+	    
+	    
 	    
 	    /* 2. User Interface handling functions */ 
 	    
@@ -166,19 +177,19 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	     */
 	    @Override
 	    public void onLogPositionCommand() {
-			/*creatureManager.step();
-			mapManager.updateGraphics();*/
-	    	//mapManager.startAnimating();
-	    	logPosition();
-	    	downloadPositions();
+	    	logPosition(); // log your position
+	    	downloadPositions(); //download the other players' positions
 	    }
 	    
+	    /**
+	     * Download the other players' positions
+	     */
 		private void downloadPositions() {
 			loggingManager.downloadOthers();
 		}
 
 		/**
-		 * T+he user told the UI that they want to log out; do that, tell the 
+		 * The user told the UI that they want to log out; do that, tell the 
 		 * user interface whether the logout was successful
 		 */
 		@Override
@@ -228,6 +239,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			loggingManager.locationIsUnavailable();
 		}
 		
+		/**
+		 * Location services are not available: take care of that
+		 */
 		@Override
 	    public void  onNoLocationServices() {
 	    	loggingManager.locationIsUnavailable();
@@ -265,7 +279,7 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 	    {
 	    	Location location = locationManager.getLocation();
 	    	if (mapManager.map_available() && location != null){
-	    		creatureManager.setCharacter(new LatLng(location.getLatitude(), location.getLongitude()));
+	    		//creatureManager.setCharacter(new LatLng(location.getLatitude(), location.getLongitude()));
 	    		mapManager.goToPosition(location);
 	    	}
 	    }
@@ -300,21 +314,35 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			uiManager.noMapServices();
 		}
 
+		/**
+		 * We want to move the map to some position, but the map is not available
+		 */
 		@Override
 		public void onGoToPosNoMap() {
 			uiManager.posNoMap();
 		}
+		
+		/**
+		 * The map has been clicked
+		 */
 
 		@Override
 		public void onMapClick(LatLng point) {
 			uiManager.mapClicked(point);
 		}
 
+		/**
+		 * Adding a beacon to the map
+		 */
 		@Override
 		public void onAddBeacon(LatLng point) {
 			creatureManager.addBeacon(point);
 			
 		}
+		
+		/**
+		 * Request beacons from the creature manager
+		 */
 
 		@Override
 		public List<Beacon> requestBeacons() {
@@ -323,49 +351,40 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			return creatureManager.getBeacons();
 		}
 
-		@Override
-		public PlayerCharacter requestCharacter() {
-			return creatureManager.getCharacter();
-		}
-
+		/**
+		 * Add a target to the manager
+		 */
 		@Override
 		public void onAddTarget(LatLng point) {
 			creatureManager.addTarget(point);
 		}
+		
+		/**
+		 * Receive the list of targets
+		 */
 
 		@Override
 		public List<Target> requestTargets() {
 			return creatureManager.getTargets();
 		}
-
+		
+		/**
+		 * Receive the list of the other players
+		 */
 		@Override
 		public List<PlayerCharacter> requestOthers() {
 			return creatureManager.getOthers();
 		}
 
 		@Override
-		public void onAddOthers(LatLng point) {
-			/*ErrorDialogFragment errorDialog = new ErrorDialogFragment();
-	    	errorDialog.mMessage="Coordinates: (" + point.latitude + ", " + point.longitude + ")" + 
-			"\n In total, we have " + creatureManager.mListOthers.size() + " people"; 
-	    	errorDialog.mTitle="Adding Player";
-	    	errorDialog.show(getSupportFragmentManager(), "LoginErrorDialogFragment");*/
-	    	
-			creatureManager.addOther(point, randomGenerator.nextInt(4)+1);
-		}
-
-		@Override
 		public void onTick() {
 			creatureManager.step();
 		}
-/*
-		@Override
-		public void onCastButtonPressed() {
-			LatLng point = creatureManager.castBeacons(); 
-			mapManager.showExplosion(point);
-			
-		}
-*/
+
+		
+		/**
+		 * Registration request received, take care of it
+		 */
 		@Override
 		public void onRegisterRequest(String userID, String groupID,
 				String password, int charSelected) {
@@ -373,6 +392,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		}
 
 
+		/**
+		 * The registration attempt succeeded
+		 */
 		@Override
 		public void onRegOK(final String userID, final String group) {
 			runOnUiThread(new Runnable(){
@@ -385,7 +407,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		}
 		
 		
-		
+		/**
+		 * The login attempt succeeded
+		 */
 		@Override
 		public void onLoginSucceeded(final String userID, final String groupID) {
 		Log.d("debug", "main");
@@ -401,6 +425,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		});
 		}
 		
+		/**
+		 * The login attempt failed
+		 */
 		@Override
 		public void onLoginFailed(final String userID, final String message) {
 		runOnUiThread(new Runnable(){
@@ -411,11 +438,17 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 		});
 		}
 
+		/**
+		 * The registration attempt failed
+		 */
 		@Override
 		public void onRegFailed(String userID, String message) {
 			uiManager.registration_failed(userID, message);
 		}
 
+		/**
+		 * The logout attempt succeeded
+		 */
 		@Override
 		public void onLogoutSucceded() {
 			runOnUiThread(new Runnable(){
@@ -428,6 +461,10 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			});
 		}
 
+		
+		/**
+		 * The logout attempt failed
+		 */
 		@Override
 		public void onLogoutFailed(final String message) {
 			runOnUiThread(new Runnable(){
@@ -440,16 +477,22 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			});
 		}
 
+		/**
+		 * The attempt to send a position failed
+		 */
 		@Override
 		public void onSendLocationFailed(final String message) {
-			runOnUiThread(new Runnable(){
+			/*runOnUiThread(new Runnable(){
 				@Override
 				public void run() {
 					uiManager.sendLocationFailed(message);
 				}
-			});
+			});*/
 		}
 
+		/**
+		 * The list of other players has been downloaded
+		 */
 		@Override
 		public void onDownloadedOthers(final JSONArray json) {
 			//creatureManager.addOther(point, randomGenerator.nextInt(4)+1);
@@ -462,7 +505,8 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 			for (int i = 0; i < numOthers; i++){
 				try {
 					JSONObject o = json.getJSONObject(i);
-					creatureManager.addOther(new LatLng(o.getDouble("latitude"), o.getDouble("longitude")), o.getInt("avatar"));
+					creatureManager.addOther(new LatLng(o.getDouble("latitude"), o.getDouble("longitude")), 
+							o.getInt("avatar"), o.getString("user_name"));
 					//uiManager.sendLocationFailed(json.toString());
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -471,32 +515,47 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 				}
 			}
 			mapManager.updateGraphics();
+			
 	    	downloadPositions();
 		
 				}
 			});
 		}
 
+		/**
+		 * We could not succeed in downloading the other players
+		 */
 		@Override
 		public void onDownloadFailure(String message) {
-			uiManager.sendLocationFailed(message);
 		}
 
+		/**
+		 * We want to change the group we belong in
+		 */
 		@Override
 		public void onChangeGroup(String newGroup) {
 			loggingManager.changeGroup(newGroup);
 		}
 
+		/**
+		 * We succeeded in changing the group
+		 */
 		@Override
 		public void onChangeGroupSucceeded(String group) {
 			uiManager.changeGroupSucceded(group);
 		}
 
+		/**
+		 * We failed in changing the group
+		 */
 		@Override
 		public void onChangeGroupFailed(String message) {
 			uiManager.changeGroupFailed(message);
 		}
-
+		
+		/**
+		 * We downloaded the messages
+		 */
 		@Override
 		public void onDownloadedMessages(final JSONArray json) {	
 			runOnUiThread(new Runnable(){
@@ -506,7 +565,9 @@ implements  LocationManagerListener, UIListener, MapManagerListener, LoggingMana
 				}
 			});
 		}
-
+		/**
+		 * We want to send a message
+		 */
 		@Override
 		public void onSendMessage(String message) {
 			loggingManager.sendMessage(message);
